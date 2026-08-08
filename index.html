@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gingerbread Operation</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Gingerbread Operation</h1>
+        <p>
+            Carefully remove the baking items without touching the edges!
+        </p>
+    </header>
+
+
+    <main>
+
+        <!-- =========================
+             PLAYER INFORMATION
+        ========================== -->
+
+        <section id="player-section">
+
+            <h2>Player Information</h2>
+
+            <p>
+                Enter your information below to begin.
+            </p>
+
+            <div class="player-fields">
+
+                <input
+                    type="text"
+                    id="first-name"
+                    placeholder="First Name"
+                    autocomplete="given-name"
+                >
+
+                <input
+                    type="text"
+                    id="last-name"
+                    placeholder="Last Name"
+                    autocomplete="family-name"
+                >
+
+                <input
+                    type="email"
+                    id="work-email"
+                    placeholder="Work Email"
+                    autocomplete="email"
+                >
+
+            </div>
+
+            <button id="start-button">
+                Start Game
+            </button>
+
+        </section>
+
+
+
+        <!-- =========================
+             GAME
+        ========================== -->
+
+        <section id="game-section">
+
+            <!-- PLAYER STATUS -->
+
+            <div id="game-info">
+
+                <p id="player-name-display"></p>
+
+                <div class="game-stats">
+
+                    <div class="stat-box">
+                        <span class="stat-label">
+                            Tickets
+                        </span>
+
+                        <span
+                            id="ticket-count"
+                            class="stat-number"
+                        >
+                            10
+                        </span>
+                    </div>
+
+
+                    <div class="stat-box">
+                        <span class="stat-label">
+                            Objects Removed
+                        </span>
+
+                        <span
+                            id="objects-removed-count"
+                            class="stat-number"
+                        >
+                            0 / 3
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- GAMEPLAY INSTRUCTIONS -->
+
+            <div id="instructions">
+
+                <h2>How to Play</h2>
+
+                <p>
+                    Use the tongs to carefully remove each baking item
+                    from the gingerbread man.
+                </p>
+
+                <p>
+                    Avoid touching the edges of the cavity.
+                    If the tongs touch an edge, the gingerbread man's
+                    nose will buzz and you will lose one ticket.
+                </p>
+
+                <p>
+                    Once an item is completely removed from its cavity,
+                    carry it to the
+                    <strong>Removed Items tray</strong>
+                    and release it there to complete the extraction.
+                </p>
+
+                <div class="instruction-reminder">
+                    Remove the item
+                    <span>→</span>
+                    Move it to the tray
+                    <span>→</span>
+                    Release to score
+                </div>
+
+            </div>
+
+
+
+            <!-- GAME BOARD -->
+
+            <div id="game-board">
+
+                <h2 class="game-board-title">
+                    Game Board
+                </h2>
+
+
+                <!-- TONGS -->
+
+                <div id="tongs">
+
+                    <div
+                        class="tong-arm tong-left"
+                    ></div>
+
+                    <div
+                        class="tong-arm tong-right"
+                    ></div>
+
+                </div>
+
+
+
+                <!-- GINGERBREAD MAN PLACEHOLDER -->
+
+                <div id="gingerbread-placeholder">
+
+                    <div id="gingerbread-nose"></div>
+
+                    <span>
+                        Gingerbread Man
+                    </span>
+
+                </div>
+
+
+
+                <!-- FIRST CAVITY -->
+
+                <div id="test-cavity">
+
+                    <span>
+                        Pull Up
+                    </span>
+
+                </div>
+
+
+
+                <!-- FIRST OBJECT -->
+
+                <div
+                    id="test-object"
+                    class="baking-object"
+                >
+                    Rolling Pin
+                </div>
+
+
+
+                <!-- REMOVED ITEMS TRAY -->
+
+                <div id="drop-zone">
+
+                    <h3>
+                        Removed Items
+                    </h3>
+
+                    <p>
+                        Safely extract an item first.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             LEADERBOARD PLACEHOLDER
+        ========================== -->
+
+        <section id="leaderboard-section">
+
+            <h2>Leaderboard</h2>
+
+            <p class="prototype-note">
+                Online leaderboard coming in the next development phase.
+            </p>
+
+            <ol id="leaderboard">
+                <li>Waiting for players...</li>
+            </ol>
+
+        </section>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
