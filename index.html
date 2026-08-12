@@ -3,85 +3,107 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Gingerbread Operation</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
+
 
 <body>
 
-    <header>
-        <h1>Gingerbread Operation</h1>
+
+<header>
+
+    <h1>
+        Gingerbread Operation
+    </h1>
+
+    <p>
+        Carefully remove the holiday items without touching the cavity edges!
+    </p>
+
+</header>
+
+
+
+<main>
+
+
+    <section id="player-section">
+
+        <h2>
+            Player Information
+        </h2>
+
         <p>
-            Carefully remove the baking items without touching the edges!
+            Enter your information below to begin.
         </p>
-    </header>
 
 
-    <main>
+        <div class="player-fields">
 
-        <!-- =========================
-             PLAYER INFORMATION
-        ========================== -->
+            <input
+                type="text"
+                id="first-name"
+                placeholder="First Name"
+                autocomplete="given-name"
+            >
 
-        <section id="player-section">
+            <input
+                type="text"
+                id="last-name"
+                placeholder="Last Name"
+                autocomplete="family-name"
+            >
 
-            <h2>Player Information</h2>
+            <input
+                type="email"
+                id="work-email"
+                placeholder="Work Email"
+                autocomplete="email"
+            >
 
-            <p>
-                Enter your information below to begin.
-            </p>
+        </div>
 
-            <div class="player-fields">
 
-                <input
-                    type="text"
-                    id="first-name"
-                    placeholder="First Name"
-                    autocomplete="given-name"
-                >
+        <button id="start-button">
+            Start Game
+        </button>
 
-                <input
-                    type="text"
-                    id="last-name"
-                    placeholder="Last Name"
-                    autocomplete="family-name"
-                >
-
-                <input
-                    type="email"
-                    id="work-email"
-                    placeholder="Work Email"
-                    autocomplete="email"
-                >
-
-            </div>
-
-            <button id="start-button">
-                Start Game
-            </button>
-
-        </section>
+    </section>
 
 
 
-        <!-- =========================
-             GAME
-        ========================== -->
+    <section id="game-section">
 
-        <section id="game-section">
 
-            <!-- PLAYER STATUS -->
+        <div id="game-info">
 
-            <div id="game-info">
+
+            <div class="info-card">
 
                 <p id="player-name-display"></p>
 
+            </div>
+
+
+
+            <div class="info-card">
+
                 <div class="game-stats">
 
+
                     <div class="stat-box">
+
                         <span class="stat-label">
                             Tickets
                         </span>
@@ -92,10 +114,13 @@
                         >
                             10
                         </span>
+
                     </div>
 
 
+
                     <div class="stat-box">
+
                         <span class="stat-label">
                             Objects Removed
                         </span>
@@ -104,156 +129,971 @@
                             id="objects-removed-count"
                             class="stat-number"
                         >
-                            0 / 3
+                            0 / 5
                         </span>
+
                     </div>
 
+
                 </div>
 
             </div>
 
 
 
-            <!-- GAMEPLAY INSTRUCTIONS -->
+            <div
+                id="instructions"
+                class="info-card"
+            >
 
-            <div id="instructions">
-
-                <h2>How to Play</h2>
+                <h2>
+                    How to Play
+                </h2>
 
                 <p>
-                    Use the tongs to carefully remove each baking item
-                    from the gingerbread man.
+                    Grab an item with the tongs and carefully
+                    <strong>lift it upward</strong>
+                    out of its cavity.
                 </p>
 
                 <p>
-                    Avoid touching the edges of the cavity.
-                    If the tongs touch an edge, the gingerbread man's
-                    nose will buzz and you will lose one ticket.
+                    Keep the item centered while lifting.
+                    If you touch the cavity edge, the gingerbread man's
+                    nose will buzz and you will lose one gameplay ticket.
                 </p>
 
                 <p>
-                    Once an item is completely removed from its cavity,
-                    carry it to the
-                    <strong>Removed Items tray</strong>
-                    and release it there to complete the extraction.
+                    Once the item is safely extracted, carry it to the
+                    <strong>Removed Items Tray</strong>
+                    and release it there.
                 </p>
+
 
                 <div class="instruction-reminder">
-                    Remove the item
+
+                    Lift carefully
+
                     <span>→</span>
-                    Move it to the tray
+
+                    Clear the cavity
+
                     <span>→</span>
-                    Release to score
+
+                    Place on tray
+
                 </div>
+
+
+                <p class="participation-note">
+                    Everyone earns
+                    <strong>1 prize ticket</strong>
+                    just for playing!
+                </p>
 
             </div>
 
 
+        </div>
 
-            <!-- GAME BOARD -->
+
+
+        <div class="board-frame">
+
 
             <div id="game-board">
+
 
                 <h2 class="game-board-title">
                     Game Board
                 </h2>
 
 
-                <!-- TONGS -->
 
-                <div id="tongs">
+                <div id="gingerbread-wrapper">
+
+
+                    <svg
+                        id="gingerbread-svg"
+                        viewBox="0 0 650 820"
+                        aria-hidden="true"
+                    >
+
+
+                        <defs>
+
+
+                            <linearGradient
+                                id="cookieGradient"
+                                x1="0"
+                                y1="0"
+                                x2="0"
+                                y2="1"
+                            >
+
+                                <stop
+                                    offset="0%"
+                                    stop-color="#D88A4B"
+                                ></stop>
+
+                                <stop
+                                    offset="100%"
+                                    stop-color="#CC7C41"
+                                ></stop>
+
+                            </linearGradient>
+
+
+
+                            <filter
+                                id="bodyShadow"
+                                x="-20%"
+                                y="-20%"
+                                width="140%"
+                                height="140%"
+                            >
+
+                                <feDropShadow
+                                    dx="0"
+                                    dy="7"
+                                    stdDeviation="7"
+                                    flood-color="#8C4C24"
+                                    flood-opacity="0.16"
+                                ></feDropShadow>
+
+                            </filter>
+
+
+
+                            <!-- CLEAN BODY SHAPE DEFINITION -->
+                            <path
+                                id="gingerbread-body-path"
+                                d="
+                                    M281.1 30.9
+                                    L250.8 45.4
+                                    L236.4 56.3
+                                    L223.2 69.6
+                                    L204.0 98.6
+                                    L197.0 115.4
+                                    L192.2 133.1
+                                    L189.6 151.9
+                                    L189.6 169.9
+                                    L194.4 200.0
+                                    L207.3 231.7
+                                    L218.7 249.0
+                                    L230.2 261.9
+                                    L229.1 266.2
+                                    L202.9 256.0
+                                    L134.2 216.5
+                                    L109.9 208.6
+                                    L90.7 207.5
+                                    L68.9 213.7
+                                    L52.7 225.5
+                                    L36.1 246.2
+                                    L27.2 267.0
+                                    L25.0 279.5
+                                    L27.2 305.0
+                                    L35.0 324.5
+                                    L46.4 341.4
+                                    L58.9 353.9
+                                    L82.6 370.7
+                                    L144.6 399.3
+                                    L161.2 408.7
+                                    L175.2 424.4
+                                    L180.7 440.4
+                                    L179.2 453.0
+                                    L171.1 472.9
+                                    L120.6 563.0
+                                    L98.1 615.1
+                                    L91.4 639.3
+                                    L88.1 663.2
+                                    L88.5 684.8
+                                    L92.5 706.3
+                                    L100.3 726.3
+                                    L111.0 742.7
+                                    L122.4 754.5
+                                    L144.2 770.1
+                                    L158.6 777.6
+                                    L174.8 782.7
+                                    L189.9 784.6
+                                    L212.8 783.0
+                                    L231.6 777.2
+                                    L249.0 765.8
+                                    L283.3 723.9
+                                    L320.2 668.3
+                                    L324.6 664.4
+                                    L331.3 663.2
+                                    L362.6 710.2
+                                    L386.6 741.9
+                                    L399.9 756.8
+                                    L420.6 772.1
+                                    L439.0 780.7
+                                    L456.0 784.2
+                                    L479.6 783.8
+                                    L497.7 779.5
+                                    L514.7 771.7
+                                    L526.8 763.1
+                                    L539.0 750.5
+                                    L546.8 739.2
+                                    L553.4 725.5
+                                    L558.9 707.1
+                                    L561.5 688.7
+                                    L561.2 667.9
+                                    L556.0 639.0
+                                    L544.6 605.3
+                                    L525.0 564.2
+                                    L476.3 477.2
+                                    L469.3 456.9
+                                    L470.0 442.8
+                                    L477.8 427.9
+                                    L497.7 410.3
+                                    L517.6 398.9
+                                    L576.7 371.9
+                                    L590.3 362.5
+                                    L604.3 348.4
+                                    L615.4 331.6
+                                    L623.2 310.0
+                                    L624.6 289.7
+                                    L621.7 273.2
+                                    L611.0 250.9
+                                    L592.9 230.6
+                                    L566.0 212.2
+                                    L544.6 207.1
+                                    L523.5 209.4
+                                    L503.6 216.5
+                                    L431.6 257.2
+                                    L443.5 238.4
+                                    L451.9 219.2
+                                    L457.5 198.8
+                                    L460.1 177.3
+                                    L459.3 155.8
+                                    L454.2 129.9
+                                    L448.6 114.7
+                                    L436.1 91.6
+                                    L422.0 73.9
+                                    L405.1 58.7
+                                    L381.1 41.8
+                                    L361.2 32.4
+                                    L341.2 27.0
+                                    L321.7 25.0
+                                    L301.4 26.2
+                                    Z
+                                "
+                            ></path>
+
+                        </defs>
+
+
+
+                        <!-- MAIN COOKIE BODY -->
+                        <use
+                            href="#gingerbread-body-path"
+                            class="cookie-body"
+                            filter="url(#bodyShadow)"
+                        ></use>
+
+
+
+                        <!-- ICING BORDER -->
+                        <use
+                            href="#gingerbread-body-path"
+                            class="cookie-icing-outline"
+                            transform="
+                                translate(325 410)
+                                scale(0.92)
+                                translate(-325 -410)
+                            "
+                        ></use>
+
+
+
+                        <!-- FACE -->
+                        <circle
+                            cx="300"
+                            cy="105"
+                            r="15"
+                            class="ginger-eye-shadow"
+                        ></circle>
+
+                        <circle
+                            cx="350"
+                            cy="105"
+                            r="15"
+                            class="ginger-eye-shadow"
+                        ></circle>
+
+
+                        <circle
+                            cx="298"
+                            cy="101"
+                            r="13"
+                            class="ginger-eye"
+                        ></circle>
+
+                        <circle
+                            cx="348"
+                            cy="101"
+                            r="13"
+                            class="ginger-eye"
+                        ></circle>
+
+
+
+                        <circle
+                            id="gingerbread-nose"
+                            cx="325"
+                            cy="144"
+                            r="17"
+                        ></circle>
+
+
+
+                        <g id="gingerbread-mouth">
+
+                            <path
+                                id="mouth-smile"
+                                class="mouth-path"
+                                d="
+                                    M290 178
+                                    C305 197 345 197 360 178
+                                "
+                            ></path>
+
+
+                            <path
+                                id="mouth-frown"
+                                class="mouth-path"
+                                d="
+                                    M290 194
+                                    C305 176 345 176 360 194
+                                "
+                            ></path>
+
+                        </g>
+
+
+                    </svg>
+
+
+
+                    <!-- SANTA HAT CAVITY -->
+                    <div class="cavity-slot hat-slot">
+
+                        <svg
+                            class="cavity-art"
+                            viewBox="0 0 1903 1265"
+                        >
+
+                            <path
+                                class="cavity-rim-shape"
+                                d="
+                                    M15 849
+                                    L35 941
+                                    L6 993
+                                    L2 1063
+                                    L25 1117
+                                    L72 1159
+                                    L316 1212
+                                    L702 1256
+                                    L1095 1263
+                                    L1347 1243
+                                    L1418 1173
+                                    L1425 1111
+                                    L1404 1057
+                                    L1450 970
+                                    L1494 1028
+                                    L1477 1085
+                                    L1498 1134
+                                    L1545 1160
+                                    L1594 1154
+                                    L1634 1206
+                                    L1694 1215
+                                    L1756 1154
+                                    L1805 1160
+                                    L1855 1131
+                                    L1873 1088
+                                    L1857 1028
+                                    L1902 960
+                                    L1880 897
+                                    L1819 869
+                                    L1813 820
+                                    L1784 784
+                                    L1725 772
+                                    L1676 801
+                                    L1626 771
+                                    L1534 474
+                                    L1450 327
+                                    L1353 208
+                                    L1168 67
+                                    L1059 22
+                                    L944 1
+                                    L816 9
+                                    L689 48
+                                    L558 119
+                                    L431 219
+                                    L241 450
+                                    L178 580
+                                    L132 736
+                                    L52 779
+                                    Z
+                                "
+                            ></path>
+
+                            <path
+                                class="cavity-depth-shape"
+                                d="
+                                    M15 849
+                                    L35 941
+                                    L6 993
+                                    L2 1063
+                                    L25 1117
+                                    L72 1159
+                                    L316 1212
+                                    L702 1256
+                                    L1095 1263
+                                    L1347 1243
+                                    L1418 1173
+                                    L1425 1111
+                                    L1404 1057
+                                    L1450 970
+                                    L1494 1028
+                                    L1477 1085
+                                    L1498 1134
+                                    L1545 1160
+                                    L1594 1154
+                                    L1634 1206
+                                    L1694 1215
+                                    L1756 1154
+                                    L1805 1160
+                                    L1855 1131
+                                    L1873 1088
+                                    L1857 1028
+                                    L1902 960
+                                    L1880 897
+                                    L1819 869
+                                    L1813 820
+                                    L1784 784
+                                    L1725 772
+                                    L1676 801
+                                    L1626 771
+                                    L1534 474
+                                    L1450 327
+                                    L1353 208
+                                    L1168 67
+                                    L1059 22
+                                    L944 1
+                                    L816 9
+                                    L689 48
+                                    L558 119
+                                    L431 219
+                                    L241 450
+                                    L178 580
+                                    L132 736
+                                    L52 779
+                                    Z
+                                "
+                            ></path>
+
+                        </svg>
+
+                    </div>
+
+
+
+                    <!-- PRESENT CAVITY -->
+                    <div class="cavity-slot present-slot">
+
+                        <svg
+                            class="cavity-art"
+                            viewBox="0 0 1555 1838"
+                        >
+
+                            <path
+                                class="cavity-rim-shape"
+                                d="
+                                    M260 52
+                                    L213 130
+                                    L258 282
+                                    L364 375
+                                    L540 442
+                                    L0 444
+                                    L0 770
+                                    L81 771
+                                    L81 1836
+                                    L1474 1836
+                                    L1474 771
+                                    L1554 770
+                                    L1554 443
+                                    L1015 442
+                                    L1181 381
+                                    L1280 304
+                                    L1339 190
+                                    L1328 81
+                                    L1249 24
+                                    L1156 0
+                                    L970 57
+                                    L836 206
+                                    L778 436
+                                    L729 226
+                                    L611 75
+                                    L432 0
+                                    Z
+                                "
+                            ></path>
+
+                            <path
+                                class="cavity-depth-shape"
+                                d="
+                                    M260 52
+                                    L213 130
+                                    L258 282
+                                    L364 375
+                                    L540 442
+                                    L0 444
+                                    L0 770
+                                    L81 771
+                                    L81 1836
+                                    L1474 1836
+                                    L1474 771
+                                    L1554 770
+                                    L1554 443
+                                    L1015 442
+                                    L1181 381
+                                    L1280 304
+                                    L1339 190
+                                    L1328 81
+                                    L1249 24
+                                    L1156 0
+                                    L970 57
+                                    L836 206
+                                    L778 436
+                                    L729 226
+                                    L611 75
+                                    L432 0
+                                    Z
+                                "
+                            ></path>
+
+                        </svg>
+
+                    </div>
+
+
+
+                    <!-- ROLLING PIN CAVITY -->
+                    <div class="cavity-slot rolling-slot">
+
+                        <svg
+                            class="cavity-art"
+                            viewBox="0 0 1672 1811"
+                        >
+
+                            <path
+                                class="cavity-rim-shape"
+                                d="
+                                    M1633 19
+                                    L1564 0
+                                    L1500 28
+                                    L1334 243
+                                    L1228 334
+                                    L1155 294
+                                    L1091 313
+                                    L276 1189
+                                    L238 1274
+                                    L297 1353
+                                    L223 1459
+                                    L19 1650
+                                    L0 1729
+                                    L30 1785
+                                    L116 1810
+                                    L189 1777
+                                    L325 1572
+                                    L441 1475
+                                    L504 1527
+                                    L560 1514
+                                    L1416 579
+                                    L1436 532
+                                    L1364 464
+                                    L1444 347
+                                    L1599 233
+                                    L1649 177
+                                    L1671 96
+                                    Z
+                                "
+                            ></path>
+
+                            <path
+                                class="cavity-depth-shape"
+                                d="
+                                    M1633 19
+                                    L1564 0
+                                    L1500 28
+                                    L1334 243
+                                    L1228 334
+                                    L1155 294
+                                    L1091 313
+                                    L276 1189
+                                    L238 1274
+                                    L297 1353
+                                    L223 1459
+                                    L19 1650
+                                    L0 1729
+                                    L30 1785
+                                    L116 1810
+                                    L189 1777
+                                    L325 1572
+                                    L441 1475
+                                    L504 1527
+                                    L560 1514
+                                    L1416 579
+                                    L1436 532
+                                    L1364 464
+                                    L1444 347
+                                    L1599 233
+                                    L1649 177
+                                    L1671 96
+                                    Z
+                                "
+                            ></path>
+
+                        </svg>
+
+                    </div>
+
+
+
+                    <!-- TREE CAVITY -->
+                    <div class="cavity-slot tree-slot">
+
+                        <svg
+                            class="cavity-art"
+                            viewBox="0 0 1311 1876"
+                        >
+
+                            <path
+                                class="cavity-rim-shape"
+                                d="
+                                    M860 0
+                                    L780 15
+                                    L682 72
+                                    L303 354
+                                    L271 426
+                                    L290 494
+                                    L338 527
+                                    L436 542
+                                    L464 570
+                                    L120 849
+                                    L41 935
+                                    L26 1054
+                                    L57 1089
+                                    L284 1174
+                                    L26 1414
+                                    L0 1510
+                                    L10 1570
+                                    L68 1604
+                                    L387 1696
+                                    L390 1804
+                                    L406 1820
+                                    L692 1875
+                                    L721 1865
+                                    L762 1766
+                                    L1016 1787
+                                    L1122 1767
+                                    L1152 1620
+                                    L1000 1311
+                                    L1254 1309
+                                    L1286 1280
+                                    L1310 1197
+                                    L1257 1037
+                                    L1050 680
+                                    L1082 664
+                                    L1189 686
+                                    L1250 672
+                                    L1286 605
+                                    L1272 522
+                                    L988 82
+                                    L926 23
+                                    Z
+                                "
+                            ></path>
+
+                            <path
+                                class="cavity-depth-shape"
+                                d="
+                                    M860 0
+                                    L780 15
+                                    L682 72
+                                    L303 354
+                                    L271 426
+                                    L290 494
+                                    L338 527
+                                    L436 542
+                                    L464 570
+                                    L120 849
+                                    L41 935
+                                    L26 1054
+                                    L57 1089
+                                    L284 1174
+                                    L26 1414
+                                    L0 1510
+                                    L10 1570
+                                    L68 1604
+                                    L387 1696
+                                    L390 1804
+                                    L406 1820
+                                    L692 1875
+                                    L721 1865
+                                    L762 1766
+                                    L1016 1787
+                                    L1122 1767
+                                    L1152 1620
+                                    L1000 1311
+                                    L1254 1309
+                                    L1286 1280
+                                    L1310 1197
+                                    L1257 1037
+                                    L1050 680
+                                    L1082 664
+                                    L1189 686
+                                    L1250 672
+                                    L1286 605
+                                    L1272 522
+                                    L988 82
+                                    L926 23
+                                    Z
+                                "
+                            ></path>
+
+                        </svg>
+
+                    </div>
+
+
+
+                    <!-- WHISK CAVITY -->
+                    <div class="cavity-slot whisk-slot">
+
+                        <svg
+                            class="cavity-art"
+                            viewBox="0 0 1708 1708"
+                        >
+
+                            <path
+                                class="cavity-rim-shape"
+                                d="
+                                    M1671 28
+                                    L1609 0
+                                    L1532 20
+                                    L853 697
+                                    L862 710
+                                    L73 1225
+                                    L15 1323
+                                    L0 1442
+                                    L36 1560
+                                    L99 1637
+                                    L191 1691
+                                    L309 1707
+                                    L408 1682
+                                    L497 1619
+                                    L996 846
+                                    L1010 853
+                                    L1686 176
+                                    L1707 99
+                                    Z
+                                "
+                            ></path>
+
+                            <path
+                                class="cavity-depth-shape"
+                                d="
+                                    M1671 28
+                                    L1609 0
+                                    L1532 20
+                                    L853 697
+                                    L862 710
+                                    L73 1225
+                                    L15 1323
+                                    L0 1442
+                                    L36 1560
+                                    L99 1637
+                                    L191 1691
+                                    L309 1707
+                                    L408 1682
+                                    L497 1619
+                                    L996 846
+                                    L1010 853
+                                    L1686 176
+                                    L1707 99
+                                    Z
+                                "
+                            ></path>
+
+                        </svg>
+
+                    </div>
+
+
+
+                    <!-- OBJECTS -->
+                    <div
+                        id="santa-hat"
+                        class="baking-object santa-hat"
+                        data-name="Santa Hat"
+                        data-lift="48"
+                        data-tolerance="20"
+                    >
+
+                        <img
+                            class="object-art hat-art"
+                            src="images/santa-hat.png"
+                            alt="Santa Hat"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
 
                     <div
-                        class="tong-arm tong-left"
-                    ></div>
+                        id="present"
+                        class="baking-object present"
+                        data-name="Present"
+                        data-lift="55"
+                        data-tolerance="19"
+                    >
+
+                        <img
+                            class="object-art present-art"
+                            src="images/present.png"
+                            alt="Present"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
 
                     <div
-                        class="tong-arm tong-right"
-                    ></div>
+                        id="rolling-pin"
+                        class="baking-object rolling-pin"
+                        data-name="Rolling Pin"
+                        data-lift="45"
+                        data-tolerance="24"
+                    >
+
+                        <img
+                            class="object-art rolling-art"
+                            src="images/rolling-pin.png"
+                            alt="Rolling Pin"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
+
+                    <div
+                        id="cookie-cutter"
+                        class="baking-object cookie-cutter"
+                        data-name="Cookie Cutter"
+                        data-lift="58"
+                        data-tolerance="19"
+                    >
+
+                        <img
+                            class="object-art tree-art"
+                            src="images/cookie-cutter.png"
+                            alt="Cookie Cutter"
+                            draggable="false"
+                        >
+
+                    </div>
+
+
+
+                    <div
+                        id="whisk"
+                        class="baking-object whisk"
+                        data-name="Whisk"
+                        data-lift="60"
+                        data-tolerance="18"
+                    >
+
+                        <img
+                            class="object-art whisk-art"
+                            src="images/whisk.png"
+                            alt="Whisk"
+                            draggable="false"
+                        >
+
+                    </div>
+
 
                 </div>
 
 
-
-                <!-- GINGERBREAD MAN PLACEHOLDER -->
-
-                <div id="gingerbread-placeholder">
-
-                    <div id="gingerbread-nose"></div>
-
-                    <span>
-                        Gingerbread Man
-                    </span>
-
-                </div>
-
-
-
-                <!-- FIRST CAVITY -->
-
-                <div id="test-cavity">
-
-                    <span>
-                        Pull Up
-                    </span>
-
-                </div>
-
-
-
-                <!-- FIRST OBJECT -->
-
-                <div
-                    id="test-object"
-                    class="baking-object"
-                >
-                    Rolling Pin
-                </div>
-
-
-
-                <!-- REMOVED ITEMS TRAY -->
 
                 <div id="drop-zone">
 
-                    <h3>
-                        Removed Items
-                    </h3>
+                    <div class="tray-inner">
 
-                    <p>
-                        Safely extract an item first.
-                    </p>
+                        <h3>
+                            Removed Items Tray
+                        </h3>
+
+                        <p>
+                            Safely extract an item first.
+                        </p>
+
+                    </div>
 
                 </div>
 
+
+
+                <div id="tongs">
+
+                    <div class="tong-arm tong-left"></div>
+
+                    <div class="tong-arm tong-right"></div>
+
+                </div>
+
+
             </div>
 
-        </section>
+
+        </div>
+
+    </section>
 
 
 
-        <!-- =========================
-             LEADERBOARD PLACEHOLDER
-        ========================== -->
+    <section id="leaderboard-section">
 
-        <section id="leaderboard-section">
+        <h2>
+            Leaderboard
+        </h2>
 
-            <h2>Leaderboard</h2>
+        <p class="prototype-note">
+            Online leaderboard coming in the next development phase.
+        </p>
 
-            <p class="prototype-note">
-                Online leaderboard coming in the next development phase.
-            </p>
+        <ol id="leaderboard">
 
-            <ol id="leaderboard">
-                <li>Waiting for players...</li>
-            </ol>
+            <li>
+                Waiting for players...
+            </li>
 
-        </section>
+        </ol>
 
-    </main>
+    </section>
 
 
-    <script src="script.js"></script>
+</main>
+
+
+<script src="script.js"></script>
+
 
 </body>
 

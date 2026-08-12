@@ -1,74 +1,194 @@
 // ===================================
-// GAME ELEMENTS
+// MAIN ELEMENTS
 // ===================================
 
 const startButton =
-    document.getElementById("start-button");
+    document.getElementById(
+        "start-button"
+    );
+
 
 const playerSection =
-    document.getElementById("player-section");
+    document.getElementById(
+        "player-section"
+    );
+
 
 const gameSection =
-    document.getElementById("game-section");
+    document.getElementById(
+        "game-section"
+    );
+
 
 const firstNameInput =
-    document.getElementById("first-name");
+    document.getElementById(
+        "first-name"
+    );
+
 
 const lastNameInput =
-    document.getElementById("last-name");
+    document.getElementById(
+        "last-name"
+    );
+
 
 const workEmailInput =
-    document.getElementById("work-email");
+    document.getElementById(
+        "work-email"
+    );
+
 
 const playerNameDisplay =
-    document.getElementById("player-name-display");
+    document.getElementById(
+        "player-name-display"
+    );
+
 
 const gameBoard =
-    document.getElementById("game-board");
+    document.getElementById(
+        "game-board"
+    );
 
-const testObject =
-    document.getElementById("test-object");
 
-const testCavity =
-    document.getElementById("test-cavity");
+const gingerbreadWrapper =
+    document.getElementById(
+        "gingerbread-wrapper"
+    );
+
 
 const dropZone =
-    document.getElementById("drop-zone");
+    document.getElementById(
+        "drop-zone"
+    );
+
 
 const tongs =
-    document.getElementById("tongs");
+    document.getElementById(
+        "tongs"
+    );
+
 
 const ticketCountDisplay =
-    document.getElementById("ticket-count");
+    document.getElementById(
+        "ticket-count"
+    );
+
 
 const objectsRemovedDisplay =
-    document.getElementById("objects-removed-count");
+    document.getElementById(
+        "objects-removed-count"
+    );
+
 
 const gingerbreadNose =
-    document.getElementById("gingerbread-nose");
+    document.getElementById(
+        "gingerbread-nose"
+    );
+
+
+const gingerbreadMouth =
+    document.getElementById(
+        "gingerbread-mouth"
+    );
+
+
+const bakingObjects =
+    document.querySelectorAll(
+        ".baking-object"
+    );
+
 
 
 // ===================================
-// GAME VARIABLES
+// GAME ITEMS
 // ===================================
 
-let tickets = 10;
+const gameItems =
+    Array.from(
+        bakingObjects
+    ).map(
 
-let objectsRemoved = 0;
+        function (element) {
 
-let isDragging = false;
+            return {
 
-let collisionCooldown = false;
+                element:
+                    element,
 
-let rollingPinExtracted = false;
+                name:
+                    element.dataset.name,
 
-let rollingPinRemoved = false;
+                liftDistance:
+                    Number(
+                        element.dataset.lift
+                    ),
 
-let startingX = null;
+                tolerance:
+                    Number(
+                        element.dataset.tolerance
+                    ),
 
-let startingY = null;
+                extracted:
+                    false,
 
-let activePointerId = null;
+                removed:
+                    false,
+
+                startingX:
+                    null,
+
+                startingY:
+                    null,
+
+                dragOffsetX:
+                    0,
+
+                dragOffsetY:
+                    0
+
+            };
+
+        }
+
+    );
+
+
+const totalObjects =
+    gameItems.length;
+
+
+
+// ===================================
+// GAME STATE
+// ===================================
+
+let tickets =
+    10;
+
+
+let objectsRemoved =
+    0;
+
+
+let isDragging =
+    false;
+
+
+let collisionCooldown =
+    false;
+
+
+let activeItem =
+    null;
+
+
+let activePointerId =
+    null;
+
+
+let gameActive =
+    false;
+
 
 
 // ===================================
@@ -76,17 +196,23 @@ let activePointerId = null;
 // ===================================
 
 startButton.addEventListener(
+
     "click",
+
     function () {
+
 
         const firstName =
             firstNameInput.value.trim();
 
+
         const lastName =
             lastNameInput.value.trim();
 
+
         const workEmail =
             workEmailInput.value.trim();
+
 
 
         if (
@@ -100,7 +226,9 @@ startButton.addEventListener(
             );
 
             return;
+
         }
+
 
 
         if (
@@ -113,7 +241,46 @@ startButton.addEventListener(
             );
 
             return;
+
         }
+
+
+
+        tickets =
+            10;
+
+
+        objectsRemoved =
+            0;
+
+
+        isDragging =
+            false;
+
+
+        collisionCooldown =
+            false;
+
+
+        activeItem =
+            null;
+
+
+        activePointerId =
+            null;
+
+
+        gameActive =
+            true;
+
+
+
+        ticketCountDisplay.textContent =
+            tickets;
+
+
+        objectsRemovedDisplay.textContent =
+            `${objectsRemoved} / ${totalObjects}`;
 
 
         playerNameDisplay.textContent =
@@ -123,90 +290,117 @@ startButton.addEventListener(
         playerSection.style.display =
             "none";
 
+
         gameSection.style.display =
             "block";
 
 
-        requestAnimationFrame(
-            function () {
 
-                startingX =
-                    testObject.offsetLeft;
-
-                startingY =
-                    testObject.offsetTop;
+        tongs.style.display =
+            "none";
 
 
-                console.log(
-                    "Rolling pin starting position:",
-                    startingX,
-                    startingY
-                );
-
-            }
+        tongs.classList.remove(
+            "closed"
         );
 
 
-        console.log(
-            "Player started game:",
-            firstName,
-            lastName,
-            workEmail
+        gingerbreadNose.classList.remove(
+            "buzzing"
+        );
+
+
+        gingerbreadMouth.classList.remove(
+            "buzzing"
+        );
+
+
+
+        requestAnimationFrame(
+
+            function () {
+
+                gameItems.forEach(
+
+                    function (item) {
+
+
+                        item.startingX =
+                            item.element.offsetLeft;
+
+
+                        item.startingY =
+                            item.element.offsetTop;
+
+
+                        item.extracted =
+                            false;
+
+
+                        item.removed =
+                            false;
+
+
+                        item.element.style.pointerEvents =
+                            "auto";
+
+
+                        item.element.classList.remove(
+                            "lifting"
+                        );
+
+
+                        item.element.classList.remove(
+                            "extracted"
+                        );
+
+
+                        item.element.classList.remove(
+                            "removed-object"
+                        );
+
+                    }
+
+                );
+
+
+                updateTrayState();
+
+            }
+
         );
 
     }
+
 );
+
 
 
 // ===================================
 // TONG MOVEMENT
 // ===================================
 
-gameBoard.addEventListener(
-    "pointerenter",
-    function () {
+document.addEventListener(
 
-        if (tickets > 0) {
+    "pointermove",
 
-            tongs.style.display =
-                "block";
-
-        }
-
-    }
-);
+    function (event) {
 
 
-gameBoard.addEventListener(
-    "pointerleave",
-    function () {
-
-        if (!isDragging) {
+        if (!gameActive) {
 
             tongs.style.display =
                 "none";
 
-        }
-
-    }
-);
-
-
-document.addEventListener(
-    "pointermove",
-    function (event) {
-
-        if (
-            gameSection.style.display !==
-            "block"
-        ) {
-
             return;
+
         }
+
 
 
         const boardRect =
             gameBoard.getBoundingClientRect();
+
 
 
         const insideBoard =
@@ -224,6 +418,7 @@ document.addEventListener(
                 boardRect.bottom;
 
 
+
         if (
             !insideBoard &&
             !isDragging
@@ -237,6 +432,7 @@ document.addEventListener(
         }
 
 
+
         if (tickets <= 0) {
 
             tongs.style.display =
@@ -247,36 +443,47 @@ document.addEventListener(
         }
 
 
-        tongs.style.display =
-            "block";
-
 
         let tongX =
+
             event.clientX -
             boardRect.left;
 
 
+
         let tongY =
+
             event.clientY -
             boardRect.top;
 
 
-        tongX = Math.max(
-            0,
-            Math.min(
-                tongX,
-                boardRect.width
-            )
-        );
+
+        tongX =
+            Math.max(
+
+                0,
+
+                Math.min(
+                    tongX,
+                    boardRect.width
+                )
+
+            );
 
 
-        tongY = Math.max(
-            0,
-            Math.min(
-                tongY,
-                boardRect.height
-            )
-        );
+
+        tongY =
+            Math.max(
+
+                0,
+
+                Math.min(
+                    tongY,
+                    boardRect.height
+                )
+
+            );
+
 
 
         tongs.style.left =
@@ -286,435 +493,799 @@ document.addEventListener(
         tongs.style.top =
             tongY + "px";
 
+
+        tongs.style.display =
+            "block";
+
     }
+
 );
 
 
-// ===================================
-// PICK UP ROLLING PIN
-// ===================================
-
-testObject.addEventListener(
-    "pointerdown",
-    function (event) {
-
-        if (rollingPinRemoved) {
-
-            return;
-
-        }
-
-
-        if (tickets <= 0) {
-
-            return;
-
-        }
-
-
-        if (collisionCooldown) {
-
-            return;
-
-        }
-
-
-        if (
-            startingX === null ||
-            startingY === null
-        ) {
-
-            startingX =
-                testObject.offsetLeft;
-
-            startingY =
-                testObject.offsetTop;
-
-        }
-
-
-        event.preventDefault();
-
-
-        isDragging = true;
-
-        activePointerId =
-            event.pointerId;
-
-
-        testObject.setPointerCapture(
-            event.pointerId
-        );
-
-
-        tongs.classList.add(
-            "closed"
-        );
-
-    }
-);
-
 
 // ===================================
-// DRAG ROLLING PIN
+// OBJECT EVENTS
 // ===================================
 
-testObject.addEventListener(
-    "pointermove",
-    function (event) {
+gameItems.forEach(
 
-        if (!isDragging) {
+    function (item) {
 
-            return;
 
-        }
+        item.element.addEventListener(
 
+            "pointerdown",
 
-        if (collisionCooldown) {
+            function (event) {
 
-            return;
-
-        }
-
-
-        const boardRect =
-            gameBoard.getBoundingClientRect();
-
-
-        const cavityRect =
-            testCavity.getBoundingClientRect();
-
-
-        const objectWidth =
-            testObject.offsetWidth;
-
-
-        const objectHeight =
-            testObject.offsetHeight;
-
-
-        // ===================================
-        // CALCULATE WHERE THE OBJECT
-        // IS TRYING TO MOVE
-        // ===================================
-
-        let newX =
-            event.clientX -
-            boardRect.left -
-            objectWidth / 2;
-
-
-        let newY =
-            event.clientY -
-            boardRect.top -
-            objectHeight / 2;
-
-
-        // Convert proposed object position
-        // into browser/page coordinates.
-
-        const proposedLeft =
-            boardRect.left +
-            newX;
-
-
-        const proposedRight =
-            proposedLeft +
-            objectWidth;
-
-
-        const proposedTop =
-            boardRect.top +
-            newY;
-
-
-        const proposedBottom =
-            proposedTop +
-            objectHeight;
-
-
-        // ===================================
-        // DEFINE THE SAFE INSIDE OF THE U
-        // ===================================
-
-        // This approximately matches the
-        // visible thickness of the brown walls.
-
-        const wallThickness = 8;
-
-
-        const safeLeft =
-            cavityRect.left +
-            wallThickness;
-
-
-        const safeRight =
-            cavityRect.right -
-            wallThickness;
-
-
-        const safeBottom =
-            cavityRect.bottom -
-            wallThickness;
-
-
-        // ===================================
-        // CHECK WHETHER OBJECT IS STILL
-        // VERTICALLY INSIDE THE CAVITY
-        // ===================================
-
-        const objectStillInCavity =
-
-            proposedBottom >
-                cavityRect.top &&
-
-            proposedTop <
-                cavityRect.bottom;
-
-
-        // ===================================
-        // COLLISION WITH LEFT OR RIGHT WALL
-        // ===================================
-
-        const hitsLeftWall =
-
-            objectStillInCavity &&
-
-            proposedLeft <=
-                safeLeft;
-
-
-        const hitsRightWall =
-
-            objectStillInCavity &&
-
-            proposedRight >=
-                safeRight;
-
-
-        // ===================================
-        // COLLISION WITH BOTTOM WALL
-        // ===================================
-
-        const horizontallyInsideCavity =
-
-            proposedRight >
-                cavityRect.left &&
-
-            proposedLeft <
-                cavityRect.right;
-
-
-        const hitsBottomWall =
-
-            horizontallyInsideCavity &&
-
-            proposedBottom >=
-                safeBottom &&
-
-            proposedTop <
-                cavityRect.bottom;
-
-
-        // ===================================
-        // COLLISION ONLY BEFORE EXTRACTION
-        // ===================================
-
-        if (!rollingPinExtracted) {
-
-            if (
-                hitsLeftWall ||
-                hitsRightWall ||
-                hitsBottomWall
-            ) {
-
-                triggerCollision();
-
-                return;
+                beginDrag(
+                    event,
+                    item
+                );
 
             }
 
+        );
+
+
+
+        item.element.addEventListener(
+
+            "pointermove",
+
+            function (event) {
+
+                dragItem(
+                    event,
+                    item
+                );
+
+            }
+
+        );
+
+
+
+        item.element.addEventListener(
+
+            "pointerup",
+
+            function (event) {
+
+                releaseItem(
+                    event,
+                    item
+                );
+
+            }
+
+        );
+
+
+
+        item.element.addEventListener(
+
+            "pointercancel",
+
+            function (event) {
+
+                cancelDrag(
+                    event,
+                    item
+                );
+
+            }
+
+        );
+
+    }
+
+);
+
+
+
+// ===================================
+// WRAPPER COORDINATE HELPERS
+// ===================================
+
+function getWrapperMetrics() {
+
+
+    const wrapperRect =
+        gingerbreadWrapper
+            .getBoundingClientRect();
+
+
+    const scaleX =
+
+        gingerbreadWrapper.offsetWidth /
+        wrapperRect.width;
+
+
+    const scaleY =
+
+        gingerbreadWrapper.offsetHeight /
+        wrapperRect.height;
+
+
+
+    return {
+
+        wrapperRect:
+            wrapperRect,
+
+        scaleX:
+            scaleX,
+
+        scaleY:
+            scaleY
+
+    };
+
+}
+
+
+
+// ===================================
+// BEGIN DRAG
+// ===================================
+
+function beginDrag(
+    event,
+    item
+) {
+
+
+    if (!gameActive) {
+
+        return;
+
+    }
+
+
+
+    if (item.removed) {
+
+        return;
+
+    }
+
+
+
+    if (tickets <= 0) {
+
+        return;
+
+    }
+
+
+
+    if (collisionCooldown) {
+
+        return;
+
+    }
+
+
+
+    event.preventDefault();
+
+
+
+    const metrics =
+        getWrapperMetrics();
+
+
+    const itemRect =
+        item.element
+            .getBoundingClientRect();
+
+
+
+    // Preserve exactly where the
+    // player grabbed the object.
+    // This prevents the item jumping
+    // to the center of the mouse.
+
+    item.dragOffsetX =
+
+        (
+            event.clientX -
+            itemRect.left
+        ) *
+        metrics.scaleX;
+
+
+
+    item.dragOffsetY =
+
+        (
+            event.clientY -
+            itemRect.top
+        ) *
+        metrics.scaleY;
+
+
+
+    isDragging =
+        true;
+
+
+    activeItem =
+        item;
+
+
+    activePointerId =
+        event.pointerId;
+
+
+
+    item.element.setPointerCapture(
+        event.pointerId
+    );
+
+
+
+    tongs.classList.add(
+        "closed"
+    );
+
+
+
+    if (!item.extracted) {
+
+        item.element.classList.add(
+            "lifting"
+        );
+
+    }
+
+}
+
+
+
+// ===================================
+// DRAG ITEM
+// ===================================
+
+function dragItem(
+    event,
+    item
+) {
+
+
+    if (
+        !isDragging ||
+        activeItem !== item
+    ) {
+
+        return;
+
+    }
+
+
+
+    if (collisionCooldown) {
+
+        return;
+
+    }
+
+
+
+    const metrics =
+        getWrapperMetrics();
+
+
+    const wrapperRect =
+        metrics.wrapperRect;
+
+
+    const scaleX =
+        metrics.scaleX;
+
+
+    const scaleY =
+        metrics.scaleY;
+
+
+
+    const boardRect =
+        gameBoard.getBoundingClientRect();
+
+
+
+    const objectWidth =
+        item.element.offsetWidth;
+
+
+    const objectHeight =
+        item.element.offsetHeight;
+
+
+
+    // ===================================
+    // CONVERT MOUSE POSITION INTO
+    // GINGERBREAD WRAPPER COORDINATES
+    // ===================================
+
+    const pointerLocalX =
+
+        (
+            event.clientX -
+            wrapperRect.left
+        ) *
+        scaleX;
+
+
+
+    const pointerLocalY =
+
+        (
+            event.clientY -
+            wrapperRect.top
+        ) *
+        scaleY;
+
+
+
+    let newX =
+
+        pointerLocalX -
+        item.dragOffsetX;
+
+
+
+    let newY =
+
+        pointerLocalY -
+        item.dragOffsetY;
+
+
+
+    // ===================================
+    // EXTRACTION MECHANIC
+    // ===================================
+
+    if (!item.extracted) {
+
+
+        const liftProgress =
+
+            item.startingY -
+            newY;
+
+
+
+        const sidewaysDrift =
+
+            Math.abs(
+                newX -
+                item.startingX
+            );
+
+
+
+        const downwardMovement =
+
+            newY -
+            item.startingY;
+
+
+
+        // -----------------------------------
+        // THE ITEM MUST BE LIFTED UPWARD
+        // WHILE STAYING MOSTLY CENTERED.
+        //
+        // This creates a real path OUT
+        // of every cavity.
+        // -----------------------------------
+
+        if (
+            sidewaysDrift >
+                item.tolerance &&
+            liftProgress <
+                item.liftDistance
+        ) {
+
+            triggerCollision(
+                item
+            );
+
+            return;
+
         }
 
 
-        // ===================================
-        // KEEP OBJECT INSIDE GAME BOARD
-        // ===================================
 
-        newX = Math.max(
-            0,
-            Math.min(
-                newX,
-                gameBoard.clientWidth -
-                    objectWidth
-            )
-        );
-
-
-        newY = Math.max(
-            0,
-            Math.min(
-                newY,
-                gameBoard.clientHeight -
-                    objectHeight
-            )
-        );
-
-
-        // ===================================
-        // MOVE THE OBJECT
-        // ===================================
-
-        testObject.style.left =
-            newX + "px";
-
-
-        testObject.style.top =
-            newY + "px";
-
-
-        // ===================================
-        // CHECK FOR SAFE EXTRACTION
-        // ===================================
-
-        // The entire rolling pin must clear
-        // the open TOP of the cavity.
-
-        const movedObjectRect =
-            testObject.getBoundingClientRect();
-
+        // Moving noticeably downward
+        // while still inside the cavity
+        // also counts as touching the edge.
 
         if (
-            !rollingPinExtracted &&
-            movedObjectRect.bottom <
-                cavityRect.top
+            downwardMovement >
+            14
         ) {
 
-            rollingPinExtracted =
+            triggerCollision(
+                item
+            );
+
+            return;
+
+        }
+
+
+
+        // -----------------------------------
+        // SAFE EXTRACTION
+        // -----------------------------------
+
+        if (
+            liftProgress >=
+            item.liftDistance
+        ) {
+
+            item.extracted =
                 true;
 
 
-            dropZone.classList.add(
-                "ready"
+            item.element.classList.remove(
+                "lifting"
             );
 
 
-            const trayMessage =
-                dropZone.querySelector("p");
+            item.element.classList.add(
+                "extracted"
+            );
 
 
-            trayMessage.textContent =
-                "Safe extraction! Drop the item here.";
-
-
-            console.log(
-                "Rolling pin safely extracted!"
+            updateTrayState(
+                item
             );
 
         }
 
     }
-);
 
 
-// ===================================
-// RELEASE ROLLING PIN
-// ===================================
 
-testObject.addEventListener(
-    "pointerup",
-    function (event) {
+    // ===================================
+    // KEEP ITEM INSIDE GAME BOARD
+    // ===================================
 
-        const objectRect =
-            testObject.getBoundingClientRect();
+    const minX =
 
-
-        const dropRect =
-            dropZone.getBoundingClientRect();
+        (
+            boardRect.left -
+            wrapperRect.left
+        ) *
+        scaleX;
 
 
-        const objectCenterX =
-            objectRect.left +
-            objectRect.width / 2;
+
+    const maxX =
+
+        (
+            boardRect.right -
+            wrapperRect.left
+        ) *
+        scaleX -
+        objectWidth;
 
 
-        const objectCenterY =
-            objectRect.top +
-            objectRect.height / 2;
+
+    const minY =
+
+        (
+            boardRect.top -
+            wrapperRect.top
+        ) *
+        scaleY;
 
 
-        const droppedInTray =
 
-            objectCenterX >=
-                dropRect.left &&
+    const maxY =
 
-            objectCenterX <=
-                dropRect.right &&
-
-            objectCenterY >=
-                dropRect.top &&
-
-            objectCenterY <=
-                dropRect.bottom;
+        (
+            boardRect.bottom -
+            wrapperRect.top
+        ) *
+        scaleY -
+        objectHeight;
 
 
-        isDragging = false;
 
-
-        tongs.classList.remove(
-            "closed"
-        );
-
-
-        if (
-            testObject.hasPointerCapture(
-                event.pointerId
+    newX =
+        Math.max(
+            minX,
+            Math.min(
+                newX,
+                maxX
             )
-        ) {
-
-            testObject.releasePointerCapture(
-                event.pointerId
-            );
-
-        }
-
-
-        activePointerId = null;
-
-
-        if (
-            rollingPinExtracted &&
-            droppedInTray
-        ) {
-
-            completeRollingPin();
-
-        }
-
-    }
-);
-
-
-// ===================================
-// POINTER CANCEL
-// ===================================
-
-testObject.addEventListener(
-    "pointercancel",
-    function () {
-
-        isDragging = false;
-
-
-        tongs.classList.remove(
-            "closed"
         );
 
 
-        activePointerId = null;
+    newY =
+        Math.max(
+            minY,
+            Math.min(
+                newY,
+                maxY
+            )
+        );
+
+
+
+    // ===================================
+    // MOVE OBJECT
+    // ===================================
+
+    item.element.style.left =
+        newX + "px";
+
+
+    item.element.style.top =
+        newY + "px";
+
+}
+
+
+
+// ===================================
+// RELEASE ITEM
+// ===================================
+
+function releaseItem(
+    event,
+    item
+) {
+
+
+    if (
+        activeItem !== item ||
+        !isDragging
+    ) {
+
+        return;
 
     }
-);
+
+
+
+    isDragging =
+        false;
+
+
+    tongs.classList.remove(
+        "closed"
+    );
+
+
+    item.element.classList.remove(
+        "lifting"
+    );
+
+
+
+    if (
+        item.element.hasPointerCapture(
+            event.pointerId
+        )
+    ) {
+
+        item.element.releasePointerCapture(
+            event.pointerId
+        );
+
+    }
+
+
+
+    activePointerId =
+        null;
+
+
+    activeItem =
+        null;
+
+
+
+    // ===================================
+    // NOT FULLY EXTRACTED YET
+    // ===================================
+
+    if (!item.extracted) {
+
+
+        // No ticket loss for simply
+        // letting go too early.
+
+        returnItemToStart(
+            item
+        );
+
+
+        updateTrayState();
+
+
+        return;
+
+    }
+
+
+
+    // ===================================
+    // CHECK TRAY DROP
+    // ===================================
+
+    const itemRect =
+        item.element
+            .getBoundingClientRect();
+
+
+    const trayRect =
+        dropZone
+            .getBoundingClientRect();
+
+
+
+    const itemCenterX =
+
+        itemRect.left +
+        itemRect.width / 2;
+
+
+    const itemCenterY =
+
+        itemRect.top +
+        itemRect.height / 2;
+
+
+
+    const droppedInTray =
+
+        itemCenterX >=
+            trayRect.left &&
+
+        itemCenterX <=
+            trayRect.right &&
+
+        itemCenterY >=
+            trayRect.top &&
+
+        itemCenterY <=
+            trayRect.bottom;
+
+
+
+    if (droppedInTray) {
+
+        completeItem(
+            item
+        );
+
+        return;
+
+    }
+
+
+
+    // The object stays safely extracted
+    // if released somewhere else.
+    // The player can grab it again
+    // and carry it to the tray.
+
+    updateTrayState(
+        item
+    );
+
+}
+
+
+
+// ===================================
+// CANCEL DRAG
+// ===================================
+
+function cancelDrag(
+    event,
+    item
+) {
+
+
+    if (activeItem !== item) {
+
+        return;
+
+    }
+
+
+
+    isDragging =
+        false;
+
+
+    tongs.classList.remove(
+        "closed"
+    );
+
+
+    item.element.classList.remove(
+        "lifting"
+    );
+
+
+
+    if (
+        item.element.hasPointerCapture(
+            event.pointerId
+        )
+    ) {
+
+        item.element.releasePointerCapture(
+            event.pointerId
+        );
+
+    }
+
+
+
+    activePointerId =
+        null;
+
+
+    activeItem =
+        null;
+
+
+
+    if (!item.extracted) {
+
+        returnItemToStart(
+            item
+        );
+
+    }
+
+
+
+    updateTrayState();
+
+}
+
+
+
+// ===================================
+// RETURN ITEM TO CAVITY
+// ===================================
+
+function returnItemToStart(
+    item
+) {
+
+
+    item.element.style.left =
+        item.startingX +
+        "px";
+
+
+    item.element.style.top =
+        item.startingY +
+        "px";
+
+
+    item.element.classList.remove(
+        "lifting"
+    );
+
+
+    item.element.classList.remove(
+        "extracted"
+    );
+
+}
+
 
 
 // ===================================
@@ -723,9 +1294,20 @@ testObject.addEventListener(
 
 function playBuzz() {
 
+
     const AudioContext =
+
         window.AudioContext ||
         window.webkitAudioContext;
+
+
+
+    if (!AudioContext) {
+
+        return;
+
+    }
+
 
 
     const audioContext =
@@ -740,12 +1322,14 @@ function playBuzz() {
         audioContext.createGain();
 
 
+
     oscillator.type =
         "sawtooth";
 
 
     oscillator.frequency.value =
         120;
+
 
 
     oscillator.connect(
@@ -758,28 +1342,54 @@ function playBuzz() {
     );
 
 
+
     gainNode.gain.setValueAtTime(
+
         0.15,
+
         audioContext.currentTime
+
     );
+
 
 
     oscillator.start();
 
 
+
     oscillator.stop(
+
         audioContext.currentTime +
         0.25
+
+    );
+
+
+
+    oscillator.addEventListener(
+
+        "ended",
+
+        function () {
+
+            audioContext.close();
+
+        }
+
     );
 
 }
 
 
+
 // ===================================
-// COLLISION / MISTAKE
+// COLLISION / BUZZ
 // ===================================
 
-function triggerCollision() {
+function triggerCollision(
+    item
+) {
+
 
     if (collisionCooldown) {
 
@@ -788,55 +1398,55 @@ function triggerCollision() {
     }
 
 
-    collisionCooldown = true;
+
+    collisionCooldown =
+        true;
 
 
-    isDragging = false;
+    isDragging =
+        false;
 
 
-    rollingPinExtracted = false;
+    item.extracted =
+        false;
 
 
-    dropZone.classList.remove(
-        "ready"
-    );
-
-
-    const trayMessage =
-        dropZone.querySelector("p");
-
-
-    trayMessage.textContent =
-        "Safely extract an item first.";
-
-
-    // Release pointer capture.
 
     if (
         activePointerId !== null &&
-        testObject.hasPointerCapture(
+        item.element.hasPointerCapture(
             activePointerId
         )
     ) {
 
-        testObject.releasePointerCapture(
+        item.element.releasePointerCapture(
             activePointerId
         );
 
     }
 
 
-    activePointerId = null;
+
+    activePointerId =
+        null;
 
 
-    // Lose ticket.
+    activeItem =
+        null;
+
+
+
+    // ===================================
+    // LOSE ONE GAMEPLAY TICKET
+    // ===================================
 
     tickets--;
 
 
     if (tickets < 0) {
 
-        tickets = 0;
+        tickets =
+            0;
 
     }
 
@@ -845,174 +1455,527 @@ function triggerCollision() {
         tickets;
 
 
-    // Red nose.
+
+    // ===================================
+    // FACE REACTION
+    // ===================================
 
     gingerbreadNose.classList.add(
         "buzzing"
     );
 
 
-    // Sound.
+    gingerbreadMouth.classList.add(
+        "buzzing"
+    );
+
+
+
+    // ===================================
+    // SOUND
+    // ===================================
 
     playBuzz();
 
 
-    // Open tongs.
+
+    // ===================================
+    // OPEN TONGS
+    // ===================================
 
     tongs.classList.remove(
         "closed"
     );
 
 
-    // Return rolling pin to start.
 
-    testObject.style.left =
-        startingX + "px";
+    // ===================================
+    // RESET ITEM
+    // ===================================
+
+    returnItemToStart(
+        item
+    );
 
 
-    testObject.style.top =
-        startingY + "px";
+    updateTrayState();
 
 
-    // Turn nose off.
+
+    // ===================================
+    // STOP FACE REACTION
+    // ===================================
 
     setTimeout(
+
         function () {
 
             gingerbreadNose.classList.remove(
                 "buzzing"
             );
 
+
+            gingerbreadMouth.classList.remove(
+                "buzzing"
+            );
+
         },
+
         500
+
     );
 
 
-    // Allow another attempt.
+
+    // ===================================
+    // COLLISION COOLDOWN
+    // ===================================
 
     setTimeout(
+
         function () {
 
-            collisionCooldown = false;
+            collisionCooldown =
+                false;
 
         },
+
         750
+
     );
 
+
+
+    // ===================================
+    // GAME OVER
+    // ===================================
 
     if (tickets <= 0) {
 
-        setTimeout(
-            function () {
-
-                alert(
-                    "Game Over! You ran out of tickets."
-                );
-
-            },
-            300
-        );
+        gameOver();
 
     }
 
 }
 
 
+
 // ===================================
-// SUCCESSFUL REMOVAL
+// COMPLETE ITEM
 // ===================================
 
-function completeRollingPin() {
+function completeItem(
+    item
+) {
 
-    if (rollingPinRemoved) {
+
+    if (item.removed) {
 
         return;
 
     }
 
 
-    rollingPinRemoved = true;
+
+    item.removed =
+        true;
+
+
+    item.extracted =
+        false;
 
 
     objectsRemoved++;
 
 
+
     objectsRemovedDisplay.textContent =
-        `${objectsRemoved} / 3`;
+
+        `${objectsRemoved} / ${totalObjects}`;
 
 
-    // ===================================
-    // SNAP ROLLING PIN TO TRAY CENTER
-    // ===================================
 
-    const boardRect =
-        gameBoard.getBoundingClientRect();
+    item.element.classList.remove(
+        "extracted"
+    );
 
 
-    const dropRect =
-        dropZone.getBoundingClientRect();
+    item.element.classList.add(
+        "removed-object"
+    );
 
 
-    const objectWidth =
-        testObject.offsetWidth;
+
+    snapItemToTray(
+        item,
+        objectsRemoved - 1
+    );
 
 
-    const objectHeight =
-        testObject.offsetHeight;
 
-
-    const trayCenterX =
-        dropRect.left -
-        boardRect.left +
-        dropRect.width / 2;
-
-
-    const trayCenterY =
-        dropRect.top -
-        boardRect.top +
-        dropRect.height / 2;
-
-
-    testObject.style.left =
-        trayCenterX -
-        objectWidth / 2 +
-        "px";
-
-
-    testObject.style.top =
-        trayCenterY -
-        objectHeight / 2 +
-        "px";
-
-
-    // Lock completed item.
-
-    testObject.style.pointerEvents =
+    item.element.style.pointerEvents =
         "none";
 
 
-    // Update tray.
 
-    dropZone.classList.remove(
-        "ready"
-    );
+    updateTrayState();
 
 
-    dropZone.classList.add(
-        "completed"
-    );
+
+    if (
+        objectsRemoved ===
+        totalObjects
+    ) {
+
+        handleWin();
+
+    }
+
+}
+
+
+
+// ===================================
+// SNAP ITEM TO TRAY
+// ===================================
+
+function snapItemToTray(
+    item,
+    completedIndex
+) {
+
+
+    const metrics =
+        getWrapperMetrics();
+
+
+    const wrapperRect =
+        metrics.wrapperRect;
+
+
+    const scaleX =
+        metrics.scaleX;
+
+
+    const scaleY =
+        metrics.scaleY;
+
+
+
+    const trayRect =
+        dropZone
+            .getBoundingClientRect();
+
+
+
+    const objectWidth =
+        item.element.offsetWidth;
+
+
+    const objectHeight =
+        item.element.offsetHeight;
+
+
+
+    const traySlots = [
+
+        {
+            x: 0.28,
+            y: 0.29
+        },
+
+        {
+            x: 0.72,
+            y: 0.29
+        },
+
+        {
+            x: 0.28,
+            y: 0.51
+        },
+
+        {
+            x: 0.72,
+            y: 0.51
+        },
+
+        {
+            x: 0.50,
+            y: 0.72
+        }
+
+    ];
+
+
+
+    const slot =
+
+        traySlots[
+
+            Math.min(
+                completedIndex,
+                traySlots.length - 1
+            )
+
+        ];
+
+
+
+    const trayClientX =
+
+        trayRect.left +
+
+        trayRect.width *
+        slot.x;
+
+
+
+    const trayClientY =
+
+        trayRect.top +
+
+        trayRect.height *
+        slot.y;
+
+
+
+    const localX =
+
+        (
+            trayClientX -
+            wrapperRect.left
+        ) *
+        scaleX -
+        objectWidth / 2;
+
+
+
+    const localY =
+
+        (
+            trayClientY -
+            wrapperRect.top
+        ) *
+        scaleY -
+        objectHeight / 2;
+
+
+
+    item.element.style.left =
+        localX +
+        "px";
+
+
+    item.element.style.top =
+        localY +
+        "px";
+
+}
+
+
+
+// ===================================
+// UPDATE TRAY
+// ===================================
+
+function updateTrayState(
+    preferredItem = null
+) {
 
 
     const trayMessage =
-        dropZone.querySelector("p");
+        dropZone.querySelector(
+            "p"
+        );
+
+
+
+    let extractedItem =
+        preferredItem;
+
+
+
+    if (
+        !extractedItem ||
+        !extractedItem.extracted ||
+        extractedItem.removed
+    ) {
+
+        extractedItem =
+
+            gameItems.find(
+
+                function (item) {
+
+                    return (
+                        item.extracted &&
+                        !item.removed
+                    );
+
+                }
+
+            );
+
+    }
+
+
+
+    dropZone.classList.toggle(
+
+        "ready",
+
+        Boolean(
+            extractedItem
+        )
+
+    );
+
+
+
+    if (extractedItem) {
+
+        trayMessage.textContent =
+
+            `Safe extraction! Place the ${extractedItem.name} on the tray.`;
+
+        return;
+
+    }
+
+
+
+    if (
+        objectsRemoved ===
+        totalObjects
+    ) {
+
+        trayMessage.textContent =
+
+            `✓ All ${totalObjects} items removed!`;
+
+        return;
+
+    }
+
+
+
+    if (objectsRemoved > 0) {
+
+        trayMessage.textContent =
+
+            `✓ ${objectsRemoved} of ${totalObjects} items safely removed.`;
+
+        return;
+
+    }
+
 
 
     trayMessage.textContent =
-        "✓ Rolling Pin Removed";
+
+        "Safely extract an item first.";
+
+}
 
 
-    console.log(
-        "Rolling pin successfully placed in tray!"
+
+// ===================================
+// GAME OVER
+// ===================================
+
+function gameOver() {
+
+
+    gameActive =
+        false;
+
+
+    tongs.style.display =
+        "none";
+
+
+
+    gameItems.forEach(
+
+        function (item) {
+
+            item.element.style.pointerEvents =
+                "none";
+
+        }
+
+    );
+
+
+
+    setTimeout(
+
+        function () {
+
+            alert(
+                "Game Over!\n\nYou ran out of gameplay tickets.\n\n🎟️ You still earned 1 prize ticket just for playing!"
+            );
+
+        },
+
+        300
+
+    );
+
+}
+
+
+
+// ===================================
+// WIN
+// ===================================
+
+function handleWin() {
+
+
+    gameActive =
+        false;
+
+
+    tongs.style.display =
+        "none";
+
+
+
+    gameItems.forEach(
+
+        function (item) {
+
+            item.element.style.pointerEvents =
+                "none";
+
+        }
+
+    );
+
+
+
+    const earnedTickets =
+
+        Math.max(
+            tickets,
+            1
+        );
+
+
+
+    setTimeout(
+
+        function () {
+
+            alert(
+                `You removed all ${totalObjects} items!\n\n🎉 Great job!\n🎟️ Prize Tickets Earned: ${earnedTickets}`
+            );
+
+        },
+
+        300
+
     );
 
 }
