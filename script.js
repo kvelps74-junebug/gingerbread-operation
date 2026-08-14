@@ -1,132 +1,157 @@
 // ===================================
+// GINGERBREAD OPERATION
+// PROTOTYPE GAME SCRIPT
+// ===================================
+
+
+// ===================================
 // MAIN ELEMENTS
 // ===================================
 
 const startButton =
-    document.getElementById(
-        "start-button"
-    );
-
+    document.getElementById("start-button");
 
 const playerSection =
-    document.getElementById(
-        "player-section"
-    );
-
+    document.getElementById("player-section");
 
 const gameSection =
-    document.getElementById(
-        "game-section"
-    );
-
+    document.getElementById("game-section");
 
 const firstNameInput =
-    document.getElementById(
-        "first-name"
-    );
-
+    document.getElementById("first-name");
 
 const lastNameInput =
-    document.getElementById(
-        "last-name"
-    );
-
+    document.getElementById("last-name");
 
 const workEmailInput =
-    document.getElementById(
-        "work-email"
-    );
-
+    document.getElementById("work-email");
 
 const playerNameDisplay =
-    document.getElementById(
-        "player-name-display"
-    );
-
+    document.getElementById("player-name-display");
 
 const gameBoard =
-    document.getElementById(
-        "game-board"
-    );
-
+    document.getElementById("game-board");
 
 const gingerbreadWrapper =
-    document.getElementById(
-        "gingerbread-wrapper"
-    );
-
+    document.getElementById("gingerbread-wrapper");
 
 const dropZone =
-    document.getElementById(
-        "drop-zone"
-    );
-
+    document.getElementById("drop-zone");
 
 const tongs =
-    document.getElementById(
-        "tongs"
-    );
-
+    document.getElementById("tongs");
 
 const ticketCountDisplay =
-    document.getElementById(
-        "ticket-count"
-    );
-
+    document.getElementById("ticket-count");
 
 const objectsRemovedDisplay =
-    document.getElementById(
-        "objects-removed-count"
-    );
-
+    document.getElementById("objects-removed-count");
 
 const gingerbreadNose =
-    document.getElementById(
-        "gingerbread-nose"
-    );
-
+    document.getElementById("gingerbread-nose");
 
 const gingerbreadMouth =
-    document.getElementById(
-        "gingerbread-mouth"
-    );
-
+    document.getElementById("gingerbread-mouth");
 
 const bakingObjects =
-    document.querySelectorAll(
-        ".baking-object"
-    );
-
+    document.querySelectorAll(".baking-object");
 
 
 // ===================================
-// GAME ITEMS
+// DIFFICULTY SETTINGS
+// ===================================
+//
+// Smaller tolerance = less sideways
+// movement allowed.
+//
+// Larger liftDistance = farther the
+// object must travel straight upward.
+// ===================================
+
+const difficultyOverrides = {
+
+    // Present must come almost
+    // perfectly straight upward.
+
+    "Present": {
+        liftDistance: 72,
+        tolerance: 7
+    },
+
+
+    // Rolling pin requires a longer,
+    // relatively straight extraction.
+
+    "Rolling Pin": {
+        liftDistance: 58,
+        tolerance: 16
+    },
+
+
+    // Whisk is intentionally difficult.
+
+    "Whisk": {
+        liftDistance: 70,
+        tolerance: 14
+    }
+
+};
+
+
+// ===================================
+// GAME ITEM DATA
 // ===================================
 
 const gameItems =
-    Array.from(
-        bakingObjects
-    ).map(
-
+    Array.from(bakingObjects).map(
         function (element) {
+
+            const name =
+                element.dataset.name;
+
+
+            const difficulty =
+                difficultyOverrides[name];
+
+
+            const artwork =
+                element.querySelector(
+                    ".object-art"
+                );
+
+
+            if (artwork) {
+
+                artwork.draggable =
+                    false;
+
+            }
+
 
             return {
 
                 element:
                     element,
 
+                artwork:
+                    artwork,
+
                 name:
-                    element.dataset.name,
+                    name,
 
                 liftDistance:
-                    Number(
-                        element.dataset.lift
-                    ),
+                    difficulty
+                        ? difficulty.liftDistance
+                        : Number(
+                            element.dataset.lift
+                        ),
 
                 tolerance:
-                    Number(
-                        element.dataset.tolerance
-                    ),
+                    difficulty
+                        ? difficulty.tolerance
+                        : Number(
+                            element.dataset.tolerance
+                        ),
 
                 extracted:
                     false,
@@ -149,13 +174,11 @@ const gameItems =
             };
 
         }
-
     );
 
 
 const totalObjects =
     gameItems.length;
-
 
 
 // ===================================
@@ -165,30 +188,94 @@ const totalObjects =
 let tickets =
     10;
 
-
 let objectsRemoved =
     0;
-
 
 let isDragging =
     false;
 
-
 let collisionCooldown =
     false;
-
 
 let activeItem =
     null;
 
-
-let activePointerId =
-    null;
-
-
 let gameActive =
     false;
 
+
+// ===================================
+// TICKET EMOJI CURSOR
+// ===================================
+
+const ticketCursor =
+    document.createElement("div");
+
+
+ticketCursor.id =
+    "ticket-cursor";
+
+
+ticketCursor.textContent =
+    "🎟️";
+
+
+document.body.appendChild(
+    ticketCursor
+);
+
+
+function enableTicketCursor() {
+
+    document.body.classList.add(
+        "ticket-cursor-mode"
+    );
+
+
+    ticketCursor.style.display =
+        "block";
+
+}
+
+
+function disableTicketCursor() {
+
+    document.body.classList.remove(
+        "ticket-cursor-mode"
+    );
+
+
+    ticketCursor.style.display =
+        "none";
+
+}
+
+
+// ===================================
+// ITEM INTERACTION
+// ===================================
+
+function setItemInteractive(
+    item,
+    enabled
+) {
+
+    item.element.style.pointerEvents =
+        enabled
+            ? "auto"
+            : "none";
+
+
+    if (item.artwork) {
+
+        item.artwork.style.pointerEvents =
+            enabled
+                ? "auto"
+                : "none";
+
+    }
+
+}
 
 
 // ===================================
@@ -196,11 +283,8 @@ let gameActive =
 // ===================================
 
 startButton.addEventListener(
-
     "click",
-
     function () {
-
 
         const firstName =
             firstNameInput.value.trim();
@@ -214,6 +298,9 @@ startButton.addEventListener(
             workEmailInput.value.trim();
 
 
+        // -----------------------------------
+        // REQUIRED FIELDS
+        // -----------------------------------
 
         if (
             firstName === "" ||
@@ -230,6 +317,9 @@ startButton.addEventListener(
         }
 
 
+        // -----------------------------------
+        // BASIC EMAIL VALIDATION
+        // -----------------------------------
 
         if (
             !workEmail.includes("@") ||
@@ -244,6 +334,12 @@ startButton.addEventListener(
 
         }
 
+
+        // -----------------------------------
+        // RESET GAME
+        // -----------------------------------
+
+        disableTicketCursor();
 
 
         tickets =
@@ -266,13 +362,8 @@ startButton.addEventListener(
             null;
 
 
-        activePointerId =
-            null;
-
-
         gameActive =
             true;
-
 
 
         ticketCountDisplay.textContent =
@@ -280,7 +371,7 @@ startButton.addEventListener(
 
 
         objectsRemovedDisplay.textContent =
-            `${objectsRemoved} / ${totalObjects}`;
+            `0 / ${totalObjects}`;
 
 
         playerNameDisplay.textContent =
@@ -293,7 +384,6 @@ startButton.addEventListener(
 
         gameSection.style.display =
             "block";
-
 
 
         tongs.style.display =
@@ -315,22 +405,44 @@ startButton.addEventListener(
         );
 
 
+        // -----------------------------------
+        // INITIALIZE OBJECTS
+        // -----------------------------------
 
         requestAnimationFrame(
-
             function () {
 
                 gameItems.forEach(
-
                     function (item) {
 
+                        // Store the original
+                        // cavity position once.
 
-                        item.startingX =
-                            item.element.offsetLeft;
+                        if (
+                            item.startingX === null ||
+                            item.startingY === null
+                        ) {
+
+                            item.startingX =
+                                item.element.offsetLeft;
 
 
-                        item.startingY =
-                            item.element.offsetTop;
+                            item.startingY =
+                                item.element.offsetTop;
+
+                        }
+
+
+                        // Reset position.
+
+                        item.element.style.left =
+                            item.startingX +
+                            "px";
+
+
+                        item.element.style.top =
+                            item.startingY +
+                            "px";
 
 
                         item.extracted =
@@ -339,10 +451,6 @@ startButton.addEventListener(
 
                         item.removed =
                             false;
-
-
-                        item.element.style.pointerEvents =
-                            "auto";
 
 
                         item.element.classList.remove(
@@ -359,33 +467,336 @@ startButton.addEventListener(
                             "removed-object"
                         );
 
-                    }
 
+                        setItemInteractive(
+                            item,
+                            true
+                        );
+
+                    }
                 );
 
 
                 updateTrayState();
 
             }
+        );
 
+    }
+);
+
+
+// ===================================
+// DETECT VISIBLE OBJECT IMAGE
+// ===================================
+//
+// This is the important pickup fix.
+//
+// We no longer depend on the smaller
+// .baking-object parent box.
+//
+// Instead, we check the REAL visible
+// image rectangle on the screen.
+// ===================================
+
+function getItemAtPointer(
+    clientX,
+    clientY
+) {
+
+    const matchingItems =
+        gameItems.filter(
+            function (item) {
+
+                if (
+                    item.removed ||
+                    !item.artwork
+                ) {
+
+                    return false;
+
+                }
+
+
+                const rect =
+                    item.artwork
+                        .getBoundingClientRect();
+
+
+                return (
+                    clientX >= rect.left &&
+                    clientX <= rect.right &&
+                    clientY >= rect.top &&
+                    clientY <= rect.bottom
+                );
+
+            }
+        );
+
+
+    if (
+        matchingItems.length === 0
+    ) {
+
+        return null;
+
+    }
+
+
+    // If two images ever overlap,
+    // choose the image whose center
+    // is closest to the pointer.
+
+    matchingItems.sort(
+        function (a, b) {
+
+            const rectA =
+                a.artwork
+                    .getBoundingClientRect();
+
+
+            const rectB =
+                b.artwork
+                    .getBoundingClientRect();
+
+
+            const centerAX =
+                rectA.left +
+                rectA.width / 2;
+
+
+            const centerAY =
+                rectA.top +
+                rectA.height / 2;
+
+
+            const centerBX =
+                rectB.left +
+                rectB.width / 2;
+
+
+            const centerBY =
+                rectB.top +
+                rectB.height / 2;
+
+
+            const distanceA =
+                Math.hypot(
+                    clientX - centerAX,
+                    clientY - centerAY
+                );
+
+
+            const distanceB =
+                Math.hypot(
+                    clientX - centerBX,
+                    clientY - centerBY
+                );
+
+
+            return (
+                distanceA -
+                distanceB
+            );
+
+        }
+    );
+
+
+    return matchingItems[0];
+
+}
+
+
+// ===================================
+// GLOBAL POINTER DOWN
+// ===================================
+//
+// Clicking ANYWHERE inside an
+// object's visible image starts drag.
+// ===================================
+
+document.addEventListener(
+    "pointerdown",
+    function (event) {
+
+        if (!gameActive) {
+
+            return;
+
+        }
+
+
+        if (tickets <= 0) {
+
+            return;
+
+        }
+
+
+        if (collisionCooldown) {
+
+            return;
+
+        }
+
+
+        if (isDragging) {
+
+            return;
+
+        }
+
+
+        const item =
+            getItemAtPointer(
+                event.clientX,
+                event.clientY
+            );
+
+
+        if (!item) {
+
+            return;
+
+        }
+
+
+        beginDrag(
+            event,
+            item
+        );
+
+    }
+);
+
+
+// ===================================
+// BEGIN DRAG
+// ===================================
+
+function beginDrag(
+    event,
+    item
+) {
+
+    if (!gameActive) {
+
+        return;
+
+    }
+
+
+    if (item.removed) {
+
+        return;
+
+    }
+
+
+    if (tickets <= 0) {
+
+        return;
+
+    }
+
+
+    if (collisionCooldown) {
+
+        return;
+
+    }
+
+
+    event.preventDefault();
+
+
+    const metrics =
+        getWrapperMetrics();
+
+
+    const itemRect =
+        item.element
+            .getBoundingClientRect();
+
+
+    // -----------------------------------
+    // PRESERVE EXACT PICKUP POINT
+    // -----------------------------------
+
+    item.dragOffsetX =
+        (
+            event.clientX -
+            itemRect.left
+        ) *
+        metrics.scaleX;
+
+
+    item.dragOffsetY =
+        (
+            event.clientY -
+            itemRect.top
+        ) *
+        metrics.scaleY;
+
+
+    isDragging =
+        true;
+
+
+    activeItem =
+        item;
+
+
+    tongs.classList.add(
+        "closed"
+    );
+
+
+    if (!item.extracted) {
+
+        item.element.classList.add(
+            "lifting"
         );
 
     }
 
-);
-
+}
 
 
 // ===================================
-// TONG MOVEMENT
+// GLOBAL POINTER MOVE
 // ===================================
 
 document.addEventListener(
-
     "pointermove",
-
     function (event) {
 
+        // -----------------------------------
+        // TICKET CURSOR
+        // -----------------------------------
+
+        if (
+            document.body.classList.contains(
+                "ticket-cursor-mode"
+            )
+        ) {
+
+            ticketCursor.style.left =
+                event.clientX +
+                "px";
+
+
+            ticketCursor.style.top =
+                event.clientY +
+                "px";
+
+        }
+
+
+        // -----------------------------------
+        // GAME NOT ACTIVE
+        // -----------------------------------
 
         if (!gameActive) {
 
@@ -397,26 +808,41 @@ document.addEventListener(
         }
 
 
+        // -----------------------------------
+        // MOVE ACTIVE OBJECT
+        // -----------------------------------
+
+        if (
+            isDragging &&
+            activeItem
+        ) {
+
+            dragItem(
+                event,
+                activeItem
+            );
+
+        }
+
+
+        // -----------------------------------
+        // MOVE TONGS
+        // -----------------------------------
 
         const boardRect =
-            gameBoard.getBoundingClientRect();
-
+            gameBoard
+                .getBoundingClientRect();
 
 
         const insideBoard =
-
             event.clientX >=
                 boardRect.left &&
-
             event.clientX <=
                 boardRect.right &&
-
             event.clientY >=
                 boardRect.top &&
-
             event.clientY <=
                 boardRect.bottom;
-
 
 
         if (
@@ -432,7 +858,6 @@ document.addEventListener(
         }
 
 
-
         if (tickets <= 0) {
 
             tongs.style.display =
@@ -443,145 +868,51 @@ document.addEventListener(
         }
 
 
-
         let tongX =
-
             event.clientX -
             boardRect.left;
 
 
-
         let tongY =
-
             event.clientY -
             boardRect.top;
 
 
-
         tongX =
             Math.max(
-
                 0,
-
                 Math.min(
                     tongX,
                     boardRect.width
                 )
-
             );
-
 
 
         tongY =
             Math.max(
-
                 0,
-
                 Math.min(
                     tongY,
                     boardRect.height
                 )
-
             );
 
 
-
         tongs.style.left =
-            tongX + "px";
+            tongX +
+            "px";
 
 
         tongs.style.top =
-            tongY + "px";
+            tongY +
+            "px";
 
 
         tongs.style.display =
             "block";
 
     }
-
 );
-
-
-
-// ===================================
-// OBJECT EVENTS
-// ===================================
-
-gameItems.forEach(
-
-    function (item) {
-
-
-        item.element.addEventListener(
-
-            "pointerdown",
-
-            function (event) {
-
-                beginDrag(
-                    event,
-                    item
-                );
-
-            }
-
-        );
-
-
-
-        item.element.addEventListener(
-
-            "pointermove",
-
-            function (event) {
-
-                dragItem(
-                    event,
-                    item
-                );
-
-            }
-
-        );
-
-
-
-        item.element.addEventListener(
-
-            "pointerup",
-
-            function (event) {
-
-                releaseItem(
-                    event,
-                    item
-                );
-
-            }
-
-        );
-
-
-
-        item.element.addEventListener(
-
-            "pointercancel",
-
-            function (event) {
-
-                cancelDrag(
-                    event,
-                    item
-                );
-
-            }
-
-        );
-
-    }
-
-);
-
 
 
 // ===================================
@@ -590,23 +921,19 @@ gameItems.forEach(
 
 function getWrapperMetrics() {
 
-
     const wrapperRect =
         gingerbreadWrapper
             .getBoundingClientRect();
 
 
     const scaleX =
-
         gingerbreadWrapper.offsetWidth /
         wrapperRect.width;
 
 
     const scaleY =
-
         gingerbreadWrapper.offsetHeight /
         wrapperRect.height;
-
 
 
     return {
@@ -625,125 +952,6 @@ function getWrapperMetrics() {
 }
 
 
-
-// ===================================
-// BEGIN DRAG
-// ===================================
-
-function beginDrag(
-    event,
-    item
-) {
-
-
-    if (!gameActive) {
-
-        return;
-
-    }
-
-
-
-    if (item.removed) {
-
-        return;
-
-    }
-
-
-
-    if (tickets <= 0) {
-
-        return;
-
-    }
-
-
-
-    if (collisionCooldown) {
-
-        return;
-
-    }
-
-
-
-    event.preventDefault();
-
-
-
-    const metrics =
-        getWrapperMetrics();
-
-
-    const itemRect =
-        item.element
-            .getBoundingClientRect();
-
-
-
-    // Preserve exactly where the
-    // player grabbed the object.
-    // This prevents the item jumping
-    // to the center of the mouse.
-
-    item.dragOffsetX =
-
-        (
-            event.clientX -
-            itemRect.left
-        ) *
-        metrics.scaleX;
-
-
-
-    item.dragOffsetY =
-
-        (
-            event.clientY -
-            itemRect.top
-        ) *
-        metrics.scaleY;
-
-
-
-    isDragging =
-        true;
-
-
-    activeItem =
-        item;
-
-
-    activePointerId =
-        event.pointerId;
-
-
-
-    item.element.setPointerCapture(
-        event.pointerId
-    );
-
-
-
-    tongs.classList.add(
-        "closed"
-    );
-
-
-
-    if (!item.extracted) {
-
-        item.element.classList.add(
-            "lifting"
-        );
-
-    }
-
-}
-
-
-
 // ===================================
 // DRAG ITEM
 // ===================================
@@ -752,7 +960,6 @@ function dragItem(
     event,
     item
 ) {
-
 
     if (
         !isDragging ||
@@ -764,13 +971,11 @@ function dragItem(
     }
 
 
-
     if (collisionCooldown) {
 
         return;
 
     }
-
 
 
     const metrics =
@@ -789,10 +994,9 @@ function dragItem(
         metrics.scaleY;
 
 
-
     const boardRect =
-        gameBoard.getBoundingClientRect();
-
+        gameBoard
+            .getBoundingClientRect();
 
 
     const objectWidth =
@@ -803,14 +1007,11 @@ function dragItem(
         item.element.offsetHeight;
 
 
-
-    // ===================================
-    // CONVERT MOUSE POSITION INTO
-    // GINGERBREAD WRAPPER COORDINATES
-    // ===================================
+    // -----------------------------------
+    // CONVERT POINTER TO LOCAL POSITION
+    // -----------------------------------
 
     const pointerLocalX =
-
         (
             event.clientX -
             wrapperRect.left
@@ -818,9 +1019,7 @@ function dragItem(
         scaleX;
 
 
-
     const pointerLocalY =
-
         (
             event.clientY -
             wrapperRect.top
@@ -828,19 +1027,14 @@ function dragItem(
         scaleY;
 
 
-
     let newX =
-
         pointerLocalX -
         item.dragOffsetX;
 
 
-
     let newY =
-
         pointerLocalY -
         item.dragOffsetY;
-
 
 
     // ===================================
@@ -849,36 +1043,25 @@ function dragItem(
 
     if (!item.extracted) {
 
-
         const liftProgress =
-
             item.startingY -
             newY;
 
 
-
         const sidewaysDrift =
-
             Math.abs(
                 newX -
                 item.startingX
             );
 
 
-
         const downwardMovement =
-
             newY -
             item.startingY;
 
 
-
         // -----------------------------------
-        // THE ITEM MUST BE LIFTED UPWARD
-        // WHILE STAYING MOSTLY CENTERED.
-        //
-        // This creates a real path OUT
-        // of every cavity.
+        // SIDE COLLISION
         // -----------------------------------
 
         if (
@@ -897,10 +1080,9 @@ function dragItem(
         }
 
 
-
-        // Moving noticeably downward
-        // while still inside the cavity
-        // also counts as touching the edge.
+        // -----------------------------------
+        // DOWNWARD COLLISION
+        // -----------------------------------
 
         if (
             downwardMovement >
@@ -914,7 +1096,6 @@ function dragItem(
             return;
 
         }
-
 
 
         // -----------------------------------
@@ -949,13 +1130,11 @@ function dragItem(
     }
 
 
-
     // ===================================
     // KEEP ITEM INSIDE GAME BOARD
     // ===================================
 
     const minX =
-
         (
             boardRect.left -
             wrapperRect.left
@@ -963,9 +1142,7 @@ function dragItem(
         scaleX;
 
 
-
     const maxX =
-
         (
             boardRect.right -
             wrapperRect.left
@@ -974,9 +1151,7 @@ function dragItem(
         objectWidth;
 
 
-
     const minY =
-
         (
             boardRect.top -
             wrapperRect.top
@@ -984,16 +1159,13 @@ function dragItem(
         scaleY;
 
 
-
     const maxY =
-
         (
             boardRect.bottom -
             wrapperRect.top
         ) *
         scaleY -
         objectHeight;
-
 
 
     newX =
@@ -1016,20 +1188,69 @@ function dragItem(
         );
 
 
-
-    // ===================================
-    // MOVE OBJECT
-    // ===================================
-
     item.element.style.left =
-        newX + "px";
+        newX +
+        "px";
 
 
     item.element.style.top =
-        newY + "px";
+        newY +
+        "px";
 
 }
 
+
+// ===================================
+// GLOBAL RELEASE
+// ===================================
+
+document.addEventListener(
+    "pointerup",
+    function (event) {
+
+        if (
+            !isDragging ||
+            !activeItem
+        ) {
+
+            return;
+
+        }
+
+
+        releaseItem(
+            event,
+            activeItem
+        );
+
+    }
+);
+
+
+// ===================================
+// POINTER CANCEL
+// ===================================
+
+document.addEventListener(
+    "pointercancel",
+    function () {
+
+        if (
+            !isDragging ||
+            !activeItem
+        ) {
+
+            return;
+
+        }
+
+
+        cancelDrag(
+            activeItem
+        );
+
+    }
+);
 
 
 // ===================================
@@ -1041,10 +1262,9 @@ function releaseItem(
     item
 ) {
 
-
     if (
-        activeItem !== item ||
-        !isDragging
+        !isDragging ||
+        activeItem !== item
     ) {
 
         return;
@@ -1052,9 +1272,12 @@ function releaseItem(
     }
 
 
-
     isDragging =
         false;
+
+
+    activeItem =
+        null;
 
 
     tongs.classList.remove(
@@ -1067,39 +1290,11 @@ function releaseItem(
     );
 
 
-
-    if (
-        item.element.hasPointerCapture(
-            event.pointerId
-        )
-    ) {
-
-        item.element.releasePointerCapture(
-            event.pointerId
-        );
-
-    }
-
-
-
-    activePointerId =
-        null;
-
-
-    activeItem =
-        null;
-
-
-
     // ===================================
-    // NOT FULLY EXTRACTED YET
+    // RELEASED BEFORE FULL EXTRACTION
     // ===================================
 
     if (!item.extracted) {
-
-
-        // No ticket loss for simply
-        // letting go too early.
 
         returnItemToStart(
             item
@@ -1112,7 +1307,6 @@ function releaseItem(
         return;
 
     }
-
 
 
     // ===================================
@@ -1129,34 +1323,25 @@ function releaseItem(
             .getBoundingClientRect();
 
 
-
     const itemCenterX =
-
         itemRect.left +
         itemRect.width / 2;
 
 
     const itemCenterY =
-
         itemRect.top +
         itemRect.height / 2;
 
 
-
     const droppedInTray =
-
         itemCenterX >=
             trayRect.left &&
-
         itemCenterX <=
             trayRect.right &&
-
         itemCenterY >=
             trayRect.top &&
-
         itemCenterY <=
             trayRect.bottom;
-
 
 
     if (droppedInTray) {
@@ -1170,11 +1355,9 @@ function releaseItem(
     }
 
 
-
-    // The object stays safely extracted
-    // if released somewhere else.
-    // The player can grab it again
-    // and carry it to the tray.
+    // Item has cleared cavity,
+    // so it can remain loose until
+    // player moves it to the tray.
 
     updateTrayState(
         item
@@ -1183,27 +1366,29 @@ function releaseItem(
 }
 
 
-
 // ===================================
 // CANCEL DRAG
 // ===================================
 
 function cancelDrag(
-    event,
     item
 ) {
 
-
-    if (activeItem !== item) {
+    if (
+        activeItem !== item
+    ) {
 
         return;
 
     }
 
 
-
     isDragging =
         false;
+
+
+    activeItem =
+        null;
 
 
     tongs.classList.remove(
@@ -1216,30 +1401,6 @@ function cancelDrag(
     );
 
 
-
-    if (
-        item.element.hasPointerCapture(
-            event.pointerId
-        )
-    ) {
-
-        item.element.releasePointerCapture(
-            event.pointerId
-        );
-
-    }
-
-
-
-    activePointerId =
-        null;
-
-
-    activeItem =
-        null;
-
-
-
     if (!item.extracted) {
 
         returnItemToStart(
@@ -1249,11 +1410,9 @@ function cancelDrag(
     }
 
 
-
     updateTrayState();
 
 }
-
 
 
 // ===================================
@@ -1263,6 +1422,9 @@ function cancelDrag(
 function returnItemToStart(
     item
 ) {
+
+    item.extracted =
+        false;
 
 
     item.element.style.left =
@@ -1287,19 +1449,15 @@ function returnItemToStart(
 }
 
 
-
 // ===================================
 // BUZZ SOUND
 // ===================================
 
 function playBuzz() {
 
-
     const AudioContext =
-
         window.AudioContext ||
         window.webkitAudioContext;
-
 
 
     if (!AudioContext) {
@@ -1309,18 +1467,18 @@ function playBuzz() {
     }
 
 
-
     const audioContext =
         new AudioContext();
 
 
     const oscillator =
-        audioContext.createOscillator();
+        audioContext
+            .createOscillator();
 
 
     const gainNode =
-        audioContext.createGain();
-
+        audioContext
+            .createGain();
 
 
     oscillator.type =
@@ -1329,7 +1487,6 @@ function playBuzz() {
 
     oscillator.frequency.value =
         120;
-
 
 
     oscillator.connect(
@@ -1342,44 +1499,31 @@ function playBuzz() {
     );
 
 
-
     gainNode.gain.setValueAtTime(
-
         0.15,
-
         audioContext.currentTime
-
     );
-
 
 
     oscillator.start();
 
 
-
     oscillator.stop(
-
         audioContext.currentTime +
         0.25
-
     );
 
 
-
     oscillator.addEventListener(
-
         "ended",
-
         function () {
 
             audioContext.close();
 
         }
-
     );
 
 }
-
 
 
 // ===================================
@@ -1390,13 +1534,11 @@ function triggerCollision(
     item
 ) {
 
-
     if (collisionCooldown) {
 
         return;
 
     }
-
 
 
     collisionCooldown =
@@ -1407,38 +1549,17 @@ function triggerCollision(
         false;
 
 
-    item.extracted =
-        false;
-
-
-
-    if (
-        activePointerId !== null &&
-        item.element.hasPointerCapture(
-            activePointerId
-        )
-    ) {
-
-        item.element.releasePointerCapture(
-            activePointerId
-        );
-
-    }
-
-
-
-    activePointerId =
-        null;
-
-
     activeItem =
         null;
 
 
+    item.extracted =
+        false;
 
-    // ===================================
-    // LOSE ONE GAMEPLAY TICKET
-    // ===================================
+
+    // -----------------------------------
+    // LOSE ONE TICKET
+    // -----------------------------------
 
     tickets--;
 
@@ -1455,10 +1576,9 @@ function triggerCollision(
         tickets;
 
 
-
-    // ===================================
+    // -----------------------------------
     // FACE REACTION
-    // ===================================
+    // -----------------------------------
 
     gingerbreadNose.classList.add(
         "buzzing"
@@ -1470,28 +1590,25 @@ function triggerCollision(
     );
 
 
-
-    // ===================================
+    // -----------------------------------
     // SOUND
-    // ===================================
+    // -----------------------------------
 
     playBuzz();
 
 
-
-    // ===================================
+    // -----------------------------------
     // OPEN TONGS
-    // ===================================
+    // -----------------------------------
 
     tongs.classList.remove(
         "closed"
     );
 
 
-
-    // ===================================
-    // RESET ITEM
-    // ===================================
+    // -----------------------------------
+    // RESET OBJECT
+    // -----------------------------------
 
     returnItemToStart(
         item
@@ -1501,13 +1618,11 @@ function triggerCollision(
     updateTrayState();
 
 
-
-    // ===================================
-    // STOP FACE REACTION
-    // ===================================
+    // -----------------------------------
+    // RESET FACE
+    // -----------------------------------
 
     setTimeout(
-
         function () {
 
             gingerbreadNose.classList.remove(
@@ -1520,35 +1635,24 @@ function triggerCollision(
             );
 
         },
-
         500
-
     );
 
 
-
-    // ===================================
+    // -----------------------------------
     // COLLISION COOLDOWN
-    // ===================================
+    // -----------------------------------
 
     setTimeout(
-
         function () {
 
             collisionCooldown =
                 false;
 
         },
-
         750
-
     );
 
-
-
-    // ===================================
-    // GAME OVER
-    // ===================================
 
     if (tickets <= 0) {
 
@@ -1559,7 +1663,6 @@ function triggerCollision(
 }
 
 
-
 // ===================================
 // COMPLETE ITEM
 // ===================================
@@ -1568,13 +1671,11 @@ function completeItem(
     item
 ) {
 
-
     if (item.removed) {
 
         return;
 
     }
-
 
 
     item.removed =
@@ -1588,11 +1689,8 @@ function completeItem(
     objectsRemoved++;
 
 
-
     objectsRemovedDisplay.textContent =
-
         `${objectsRemoved} / ${totalObjects}`;
-
 
 
     item.element.classList.remove(
@@ -1605,21 +1703,19 @@ function completeItem(
     );
 
 
-
     snapItemToTray(
         item,
         objectsRemoved - 1
     );
 
 
-
-    item.element.style.pointerEvents =
-        "none";
-
+    setItemInteractive(
+        item,
+        false
+    );
 
 
     updateTrayState();
-
 
 
     if (
@@ -1634,7 +1730,6 @@ function completeItem(
 }
 
 
-
 // ===================================
 // SNAP ITEM TO TRAY
 // ===================================
@@ -1643,7 +1738,6 @@ function snapItemToTray(
     item,
     completedIndex
 ) {
-
 
     const metrics =
         getWrapperMetrics();
@@ -1661,11 +1755,9 @@ function snapItemToTray(
         metrics.scaleY;
 
 
-
     const trayRect =
         dropZone
             .getBoundingClientRect();
-
 
 
     const objectWidth =
@@ -1674,7 +1766,6 @@ function snapItemToTray(
 
     const objectHeight =
         item.element.offsetHeight;
-
 
 
     const traySlots = [
@@ -1707,40 +1798,28 @@ function snapItemToTray(
     ];
 
 
-
     const slot =
-
         traySlots[
-
             Math.min(
                 completedIndex,
                 traySlots.length - 1
             )
-
         ];
 
 
-
     const trayClientX =
-
         trayRect.left +
-
         trayRect.width *
         slot.x;
 
 
-
     const trayClientY =
-
         trayRect.top +
-
         trayRect.height *
         slot.y;
 
 
-
     const localX =
-
         (
             trayClientX -
             wrapperRect.left
@@ -1749,16 +1828,13 @@ function snapItemToTray(
         objectWidth / 2;
 
 
-
     const localY =
-
         (
             trayClientY -
             wrapperRect.top
         ) *
         scaleY -
         objectHeight / 2;
-
 
 
     item.element.style.left =
@@ -1773,15 +1849,13 @@ function snapItemToTray(
 }
 
 
-
 // ===================================
-// UPDATE TRAY
+// UPDATE TRAY MESSAGE
 // ===================================
 
 function updateTrayState(
     preferredItem = null
 ) {
-
 
     const trayMessage =
         dropZone.querySelector(
@@ -1789,10 +1863,8 @@ function updateTrayState(
         );
 
 
-
     let extractedItem =
         preferredItem;
-
 
 
     if (
@@ -1802,9 +1874,7 @@ function updateTrayState(
     ) {
 
         extractedItem =
-
             gameItems.find(
-
                 function (item) {
 
                     return (
@@ -1813,35 +1883,27 @@ function updateTrayState(
                     );
 
                 }
-
             );
 
     }
 
 
-
     dropZone.classList.toggle(
-
         "ready",
-
         Boolean(
             extractedItem
         )
-
     );
-
 
 
     if (extractedItem) {
 
         trayMessage.textContent =
-
             `Safe extraction! Place the ${extractedItem.name} on the tray.`;
 
         return;
 
     }
-
 
 
     if (
@@ -1850,7 +1912,6 @@ function updateTrayState(
     ) {
 
         trayMessage.textContent =
-
             `✓ All ${totalObjects} items removed!`;
 
         return;
@@ -1858,11 +1919,9 @@ function updateTrayState(
     }
 
 
-
     if (objectsRemoved > 0) {
 
         trayMessage.textContent =
-
             `✓ ${objectsRemoved} of ${totalObjects} items safely removed.`;
 
         return;
@@ -1870,13 +1929,10 @@ function updateTrayState(
     }
 
 
-
     trayMessage.textContent =
-
         "Safely extract an item first.";
 
 }
-
 
 
 // ===================================
@@ -1885,31 +1941,43 @@ function updateTrayState(
 
 function gameOver() {
 
-
     gameActive =
         false;
+
+
+    isDragging =
+        false;
+
+
+    activeItem =
+        null;
 
 
     tongs.style.display =
         "none";
 
 
-
-    gameItems.forEach(
-
-        function (item) {
-
-            item.element.style.pointerEvents =
-                "none";
-
-        }
-
+    tongs.classList.remove(
+        "closed"
     );
 
 
+    gameItems.forEach(
+        function (item) {
+
+            setItemInteractive(
+                item,
+                false
+            );
+
+        }
+    );
+
+
+    enableTicketCursor();
+
 
     setTimeout(
-
         function () {
 
             alert(
@@ -1917,13 +1985,10 @@ function gameOver() {
             );
 
         },
-
         300
-
     );
 
 }
-
 
 
 // ===================================
@@ -1932,40 +1997,50 @@ function gameOver() {
 
 function handleWin() {
 
-
     gameActive =
         false;
+
+
+    isDragging =
+        false;
+
+
+    activeItem =
+        null;
 
 
     tongs.style.display =
         "none";
 
 
-
-    gameItems.forEach(
-
-        function (item) {
-
-            item.element.style.pointerEvents =
-                "none";
-
-        }
-
+    tongs.classList.remove(
+        "closed"
     );
 
 
+    gameItems.forEach(
+        function (item) {
+
+            setItemInteractive(
+                item,
+                false
+            );
+
+        }
+    );
+
+
+    enableTicketCursor();
+
 
     const earnedTickets =
-
         Math.max(
             tickets,
             1
         );
 
 
-
     setTimeout(
-
         function () {
 
             alert(
@@ -1973,9 +2048,7 @@ function handleWin() {
             );
 
         },
-
         300
-
     );
 
 }
