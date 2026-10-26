@@ -1,4 +1,14 @@
 // ===================================
+// SUPABASE CONNECTION
+// ===================================
+
+const SUPABASE_FUNCTION_URL =
+    "https://eddeexcqsmzfzyknmybx.supabase.co/functions/v1/submit-game-result";
+
+const SUPABASE_PUBLIC_KEY =
+    "sb_publishable_Xn5tubxzdr054Ig59xBoWg_2Yu5mr3w";
+
+// ===================================
 // GINGERBREAD OPERATION
 // PROTOTYPE GAME SCRIPT
 // ===================================
@@ -203,6 +213,8 @@ let activeItem =
 let gameActive =
     false;
 
+let currentPlayerId = 
+    null;
 
 // ===================================
 // TICKET EMOJI CURSOR
@@ -277,6 +289,38 @@ function setItemInteractive(
 
 }
 
+// ===================================
+// REGISTER PLAYER WITH SUPABASE
+// ===================================
+
+
+
+async function registerPlayer(firstName, lastName, workEmail) {
+    const response = await fetch(SUPABASE_FUNCTION_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_PUBLIC_KEY,
+            "Authorization": `Bearer ${SUPABASE_PUBLIC_KEY}`
+        },
+        body: JSON.stringify({
+            action: "register",
+            first_name: firstName,
+            last_name: lastName,
+            work_email: workEmail
+        })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            result.error || "Unable to register. Please try again."
+        );
+    }
+
+    return result;
+}
 
 // ===================================
 // START GAME
@@ -284,7 +328,7 @@ function setItemInteractive(
 
 startButton.addEventListener(
     "click",
-    function () {
+    async function () {
 
         const firstName =
             firstNameInput.value.trim();
@@ -334,6 +378,35 @@ startButton.addEventListener(
 
         }
 
+     // -----------------------------------
+// REGISTER PLAYER WITH SUPABASE
+// -----------------------------------
+
+startButton.disabled = true;
+
+try {
+    const player = await registerPlayer(
+        firstName,
+        lastName,
+        workEmail
+    );
+
+    // Save the registered player's ID for submitting their result later.
+    currentPlayerId = player.player_id;
+
+} catch (error) {
+    console.error("Player registration failed:", error);
+
+    alert(
+        error.message ||
+        "We couldn't register you. Please try again."
+    );
+
+    return;
+
+} finally {
+    startButton.disabled = false;
+}   
 
         // -----------------------------------
         // RESET GAME
