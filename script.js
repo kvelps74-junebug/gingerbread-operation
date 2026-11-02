@@ -323,6 +323,74 @@ async function registerPlayer(firstName, lastName, workEmail) {
 }
 
 // ===================================
+// SUBMIT GAME RESULT TO SUPABASE
+// ===================================
+
+let resultSubmissionInProgress = false;
+let resultSubmitted = false;
+
+async function submitGameResult(score) {
+
+    if (resultSubmitted || resultSubmissionInProgress) {
+        return;
+    }
+
+    if (!currentPlayerId) {
+        throw new Error("Player ID is missing.");
+    }
+
+    resultSubmissionInProgress = true;
+
+    try {
+
+        const response = await fetch(SUPABASE_FUNCTION_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "apikey": SUPABASE_PUBLIC_KEY,
+                "Authorization": `Bearer ${SUPABASE_PUBLIC_KEY}`
+            },
+
+            body: JSON.stringify({
+
+                action: "submit_result",
+
+                player_id: currentPlayerId,
+
+                score: score,
+
+                objects_removed: objectsRemoved,
+
+                tickets_remaining: tickets
+
+            })
+
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.error || "Unable to save game result."
+            );
+        }
+
+        resultSubmitted = true;
+
+        return result;
+
+    } finally {
+
+        resultSubmissionInProgress = false;
+
+    }
+
+}
+
+
+// ===================================
 // START GAME
 // ===================================
 
@@ -2050,12 +2118,31 @@ function gameOver() {
     enableTicketCursor();
 
 
-    setTimeout(
-        function () {
+        setTimeout(
+        async function () {
 
-            alert(
-                "Game Over!\n\nYou ran out of gameplay tickets.\n\n🎟️ You still earned 1 prize ticket just for playing!"
-            );
+            try {
+
+                await submitGameResult(
+                    1
+                );
+
+                alert(
+                    "Game Over!\n\nYou ran out of gameplay tickets.\n\n🎟️ You still earned 1 prize ticket just for playing!"
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Error saving game result:",
+                    error
+                );
+
+                alert(
+                    "Your game is over, but we couldn't save your result. Please notify the game administrator."
+                );
+
+            }
 
         },
         300
@@ -2113,15 +2200,33 @@ function handleWin() {
         );
 
 
-    setTimeout(
-        function () {
+        setTimeout(
+        async function () {
 
-            alert(
-                `You removed all ${totalObjects} items!\n\n🎉 Great job!\n🎟️ Prize Tickets Earned: ${earnedTickets}`
-            );
+            try {
+
+                await submitGameResult(
+                    earnedTickets
+                );
+
+                alert(
+                    `You removed all ${totalObjects} items!\n\n🎉 Great job!\n🎟️ Prize Tickets Earned: ${earnedTickets}`
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Error saving game result:",
+                    error
+                );
+
+                alert(
+                    "You won, but we couldn't save your game result. Please notify the game administrator."
+                );
+
+            }
 
         },
         300
     );
-
 }
