@@ -1,758 +1,641 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gingerbread Operation | Admin</title>
-<style>
-:root {
-  --green: #176c48;
-  --green-dark: #105438;
-  --cream: #fff7e8;
-  --cream-dark: #f7ead4;
-  --brown: #44362f;
-  --muted: #88796f;
-  --border: #efe3d3;
-  --red: #a83b32;
-  --white: #fff;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--cream);
-  color: var(--brown);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-}
-button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
-button:focus-visible, input:focus-visible,
-select:focus-visible, textarea:focus-visible {
-  outline: 3px solid #d5a34c;
-  outline-offset: 2px;
-}
-.topbar {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  padding: 22px 4.5%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-.brand { font-size: 27px; font-weight: 750; }
-.subtitle { margin-top: 7px; color: var(--muted); }
-.pill {
-  display: inline-block;
-  border-radius: 30px;
-  padding: 9px 15px;
-  background: #e5f2e9;
-  color: var(--green);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .3px;
-}
-main { max-width: 1450px; margin: auto; padding: 30px 28px 55px; }
-.notice {
-  border: 1px solid #f0d69b;
-  background: #fff0cc;
-  border-radius: 13px;
-  padding: 15px 18px;
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-.grid { display: grid; gap: 18px; }
-.stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 19px;
-  padding: 24px;
-  box-shadow: 0 5px 18px #6a4a1510;
-  min-width: 0;
-}
-.stat-label { color: var(--muted); font-size: 14px; }
-.stat-number { font-size: 32px; font-weight: 750; margin: 24px 0 12px; }
-.stat-note { color: var(--muted); font-size: 13px; }
-.section-title { margin: 0 0 20px; font-size: 21px; }
-.two-col { grid-template-columns: 1.2fr 1fr; margin-top: 24px; }
-.nav {
-  display: flex;
-  gap: 9px;
-  flex-wrap: wrap;
-  margin: 25px 0;
-}
-.nav button, .btn {
-  border: 1px solid var(--border);
-  background: white;
-  color: var(--brown);
-  padding: 11px 15px;
-  border-radius: 10px;
-  font-weight: 650;
-}
-.nav button.active, .btn.primary {
-  background: var(--green);
-  color: white;
-  border-color: var(--green);
-}
-.btn.primary:hover { background: var(--green-dark); }
-.btn.danger { color: var(--red); border-color: #e7c1bc; }
-.btn.small { padding: 7px 10px; font-size: 13px; }
-.panel { display: none; }
-.panel.active { display: block; }
-.field { display: grid; gap: 7px; margin-bottom: 15px; }
-label { font-weight: 650; font-size: 14px; }
-input, select, textarea {
-  width: 100%;
-  min-width: 0;
-  border: 1px solid #d9ccbc;
-  border-radius: 9px;
-  background: white;
-  padding: 11px 12px;
-  color: var(--brown);
-}
-textarea { min-height: 95px; resize: vertical; }
-.row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.row > input { flex: 1; min-width: 200px; }
-.muted { color: var(--muted); }
-.small-text { font-size: 13px; }
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 650px; }
-th, td {
-  padding: 13px 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-  font-size: 14px;
-}
-th { color: var(--muted); font-weight: 700; font-size: 12px; }
-.empty { padding: 24px 0; color: var(--muted); }
-.badge {
-  display: inline-block;
-  border-radius: 20px;
-  background: #e6f3e9;
-  color: var(--green);
-  padding: 5px 9px;
-  font-size: 12px;
-  font-weight: 750;
-}
-.badge.off { background: #f8e4e0; color: var(--red); }
-.activity-item { padding: 13px 0; border-bottom: 1px solid var(--border); }
-.activity-item:last-child { border-bottom: 0; }
-footer { text-align: center; padding: 15px 20px 35px; color: var(--muted); }
-#login-screen {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-}
-.login-card { width: min(100%, 430px); }
-.login-card .brand { font-size: 25px; margin-bottom: 8px; }
-.login-card .card { padding: 32px; }
-#app { display: none; }
-hr { border: 0; border-top: 1px solid var(--border); margin: 22px 0; }
-.toast {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  max-width: min(420px, calc(100vw - 40px));
-  padding: 14px 18px;
-  background: var(--green-dark);
-  color: white;
-  border-radius: 10px;
-  box-shadow: 0 6px 24px #0002;
-  display: none;
-  z-index: 10;
-}
-@media (max-width: 950px) {
-  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .two-col { grid-template-columns: 1fr; }
-}
-@media (max-width: 560px) {
-  main { padding: 20px 14px 35px; }
-  .topbar { padding: 18px 16px; align-items: flex-start; }
-  .brand { font-size: 21px; }
-  .stats { grid-template-columns: 1fr; }
-  .card { padding: 19px; }
-  .login-card .card { padding: 23px; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gingerbread Operation | Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --green: #176c48;
+      --green-dark: #105438;
+      --cream: #fff7e8;
+      --brown: #44362f;
+      --muted: #88796f;
+      --border: #efe3d3;
+      --red: #a83b32;
+      --white: #fff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--brown);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid #d5a34c;
+      outline-offset: 2px;
+    }
+
+    .hidden { display: none !important; }
+
+    #login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .login-card { width: min(100%, 440px); }
+
+    .brand {
+      font-size: 27px;
+      font-weight: 750;
+    }
+
+    .subtitle {
+      margin-top: 7px;
+      color: var(--muted);
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 19px;
+      padding: 26px;
+      box-shadow: 0 5px 18px #6a4a1510;
+    }
+
+    .login-card .card {
+      margin-top: 22px;
+      padding: 32px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 23px;
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin: 18px 0;
+    }
+
+    label {
+      font-weight: 650;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid #d9ccbc;
+      border-radius: 9px;
+      background: white;
+      padding: 12px;
+      color: var(--brown);
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--brown);
+      padding: 11px 15px;
+      border-radius: 10px;
+      font-weight: 650;
+    }
+
+    .btn.primary {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+
+    .btn.primary:hover { background: var(--green-dark); }
+    .btn:disabled { opacity: .6; cursor: wait; }
+    .full { width: 100%; }
+
+    .error {
+      color: var(--red);
+      min-height: 20px;
+    }
+
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 22px 4.5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .topbar .brand { font-size: 25px; }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 9px 15px;
+      background: #e5f2e9;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    main {
+      max-width: 1250px;
+      margin: auto;
+      padding: 30px 28px 55px;
+    }
+
+    .intro {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .toolbar .field {
+      margin: 0;
+      min-width: 220px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 750;
+      margin-top: 14px;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .empty {
+      padding: 24px 0;
+      color: var(--muted);
+    }
+
+    .status {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px 20px 35px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 700px) {
+      .stats { grid-template-columns: 1fr; }
+      main { padding: 22px 14px 35px; }
+      .topbar {
+        padding: 18px 16px;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- LOCAL DEMO LOGIN ONLY. NOT SECURE AUTHENTICATION. -->
-<section id="login-screen">
-  <div class="login-card">
-    <div class="brand">🍪 Gingerbread Operation</div>
-    <p class="muted">Administration Portal</p>
-    <div class="card">
-      <h1 class="section-title">Admin sign in</h1>
-      <p class="muted small-text">
-        Local interface preview. Do not enter real player data.
-      </p>
-      <form id="login-form">
-        <div class="field">
-          <label for="admin-password">Demo password</label>
-          <input id="admin-password" type="password"
-            autocomplete="current-password" required>
-        </div>
-        <button class="btn primary" type="submit" style="width:100%">
-          Sign in to preview
-        </button>
-        <p id="login-error" role="alert" class="small-text"
-          style="color:var(--red)"></p>
-      </form>
-      <p class="muted small-text">
-        Demo password: <strong>gingerbread-demo</strong>
-      </p>
-    </div>
-  </div>
-</section>
-
-<div id="app">
-  <header class="topbar">
-    <div>
+  <!-- ADMIN LOGIN -->
+  <section id="login-screen">
+    <div class="login-card">
       <div class="brand">🍪 Gingerbread Operation</div>
-      <div class="subtitle">Administration Portal</div>
-    </div>
-    <div class="row">
-      <span class="pill">LOCAL DEMO</span>
-      <button class="btn small" id="logout-button">Log out</button>
-    </div>
-  </header>
+      <p class="subtitle">Administration Portal</p>
 
-  <main>
-    <div class="notice">
-      <strong>Prototype mode:</strong> This is a local demonstration.
-      Records below are stored only in this browser and can be changed
-      by anyone with access to it. Login is not secure. No live game
-      settings, real player records, or public leaderboard are connected.
-    </div>
-
-    <nav class="nav" aria-label="Admin sections">
-      <button class="active" data-panel="dashboard">Dashboard</button>
-      <button data-panel="players">Players</button>
-      <button data-panel="tickets">Ticket Management</button>
-      <button data-panel="leaderboard">Leaderboard</button>
-      <button data-panel="operations">Game Operations</button>
-    </nav>
-
-    <section id="dashboard" class="panel active">
-      <div class="grid stats">
-        <div class="card">
-          <div class="stat-label">Total Game Plays</div>
-          <div class="stat-number" id="stat-plays">0</div>
-          <div class="stat-note">Demo records only</div>
-        </div>
-        <div class="card">
-          <div class="stat-label">Unique Players</div>
-          <div class="stat-number" id="stat-players">0</div>
-          <div class="stat-note">Distinct demo emails</div>
-        </div>
-        <div class="card">
-          <div class="stat-label">Prize Tickets Awarded</div>
-          <div class="stat-number" id="stat-tickets">0</div>
-          <div class="stat-note">Before manual adjustments</div>
-        </div>
-        <div class="card">
-          <div class="stat-label">Successful Challenges</div>
-          <div class="stat-number" id="stat-wins">0</div>
-          <div class="stat-note">All objects removed</div>
-        </div>
-      </div>
-
-      <div class="grid two-col">
-        <div class="card">
-          <h2 class="section-title">Recent Game Activity</h2>
-          <div id="recent-activity" class="muted">No activity yet.</div>
-        </div>
-        <div class="card">
-          <h2 class="section-title">Game Operations</h2>
-          <p class="muted">Local preview status</p>
-          <p>Game: <span id="dashboard-game-status" class="badge">Enabled</span></p>
-          <p>Leaderboard: <span class="badge">Demo data</span></p>
-          <button class="btn primary" data-goto="operations">Manage game</button>
-          <button class="btn" data-goto="leaderboard">View leaderboard</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="players" class="panel">
       <div class="card">
-        <h2 class="section-title">Player Management</h2>
-        <p class="muted small-text">
-          Demo player records only. Do not enter real personal information.
+        <h1>Admin sign in</h1>
+        <p class="muted small">
+          Sign in with your authorized administrator account.
         </p>
-        <div class="row" style="margin-bottom:18px">
-          <input id="player-search" type="search"
-            placeholder="Search demo name or email">
-          <button class="btn" id="clear-search">Clear</button>
+
+        <form id="login-form">
+          <div class="field">
+            <label for="admin-email">Email address</label>
+            <input
+              id="admin-email"
+              type="email"
+              autocomplete="username"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="admin-password">Password</label>
+            <input
+              id="admin-password"
+              type="password"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+
+          <button
+            id="login-button"
+            class="btn primary full"
+            type="submit"
+          >
+            Sign in
+          </button>
+
+          <p id="login-error" class="error small" role="alert"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMIN DASHBOARD -->
+  <div id="app" class="hidden">
+
+    <header class="topbar">
+      <div>
+        <div class="brand">🍪 Gingerbread Operation</div>
+        <div class="subtitle">Administration Portal</div>
+      </div>
+
+      <div class="top-actions">
+        <span class="pill">ADMIN ACCESS</span>
+        <button id="logout-button" class="btn">Log out</button>
+      </div>
+    </header>
+
+    <main>
+      <h1>Daily game results</h1>
+
+      <p class="intro">
+        View who played, their work email, and the prize tickets they earned.
+      </p>
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="report-date">Choose a play date</label>
+          <input id="report-date" type="date">
         </div>
+
+        <button id="refresh-button" class="btn primary">
+          Refresh results
+        </button>
+      </div>
+
+      <section class="stats">
+        <div class="card">
+          <div class="stat-label">Players today</div>
+          <div id="total-plays" class="stat-number">—</div>
+        </div>
+
+        <div class="card">
+          <div class="stat-label">Prize tickets awarded</div>
+          <div id="total-tickets" class="stat-number">—</div>
+        </div>
+
+        <div class="card">
+          <div class="stat-label">Selected date</div>
+          <div
+            id="selected-date-label"
+            class="stat-number"
+            style="font-size:20px"
+          >—</div>
+        </div>
+      </section>
+
+      <section class="card">
         <div class="table-wrap">
           <table>
-            <thead><tr>
-              <th>Player</th><th>Work Email</th><th>Plays</th>
-              <th>Prize Tickets</th><th>Wins</th>
-            </tr></thead>
-            <tbody id="players-table"></tbody>
+            <thead>
+              <tr>
+                <th>Player name</th>
+                <th>Work email</th>
+                <th>Prize tickets earned</th>
+                <th>Played at</th>
+              </tr>
+            </thead>
+
+            <tbody id="results-table">
+              <tr>
+                <td colspan="4" class="empty">
+                  Sign in to load results.
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
-        <hr>
-        <h3>Register demo player</h3>
-        <form id="player-form">
-          <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
-            <div class="field"><label for="first-name">First name</label>
-              <input id="first-name" required></div>
-            <div class="field"><label for="last-name">Last name</label>
-              <input id="last-name" required></div>
-          </div>
-          <div class="field"><label for="work-email">Work email</label>
-            <input id="work-email" type="email" required></div>
-          <button class="btn primary" type="submit">Add demo player</button>
-        </form>
-      </div>
-    </section>
 
-    <section id="tickets" class="panel">
-      <div class="card">
-        <h2 class="section-title">Ticket Management</h2>
-        <p class="muted small-text">
-          Adjustments here affect only demo totals in this browser.
-        </p>
-        <form id="ticket-form">
-          <div class="field">
-            <label for="ticket-player">Player</label>
-            <select id="ticket-player" required></select>
-          </div>
-          <div class="field">
-            <label for="ticket-change">Adjustment (+ add, − deduct)</label>
-            <input id="ticket-change" type="number" step="1" required>
-          </div>
-          <div class="field">
-            <label for="ticket-reason">Reason for adjustment</label>
-            <textarea id="ticket-reason" required
-              placeholder="Explain why this adjustment is needed"></textarea>
-          </div>
-          <button class="btn primary" type="submit">Record adjustment</button>
-        </form>
-        <hr>
-        <h3>Adjustment audit trail</h3>
-        <div class="table-wrap">
-          <table><thead><tr>
-            <th>Date</th><th>Player</th><th>Change</th><th>Reason</th>
-          </tr></thead><tbody id="adjustments-table"></tbody></table>
-        </div>
-      </div>
-    </section>
+        <p id="report-status" class="status" role="status"></p>
+      </section>
+    </main>
 
-    <section id="leaderboard" class="panel">
-      <div class="card">
-        <h2 class="section-title">Public Leaderboard Preview</h2>
-        <p class="muted small-text">
-          Ranked by net prize tickets. Public names use first name and last initial.
-          These rankings are local demo data, not published online.
-        </p>
-        <div class="table-wrap">
-          <table><thead><tr>
-            <th>Rank</th><th>Player</th><th>Net Prize Tickets</th>
-            <th>Successful Challenges</th><th>Moderation</th>
-          </tr></thead><tbody id="leaderboard-table"></tbody></table>
-        </div>
-      </div>
-    </section>
+    <footer>Gingerbread Operation · Administration</footer>
+  </div>
 
-    <section id="operations" class="panel">
-      <div class="grid two-col">
-        <div class="card">
-          <h2 class="section-title">Game Availability</h2>
-          <p>Current status: <span id="game-status" class="badge">Enabled</span></p>
-          <p class="muted small-text">
-            This changes the demo status only. It does not stop the actual game.
-          </p>
-          <button id="toggle-game" class="btn primary">Disable demo game</button>
-          <div class="field" style="margin-top:20px">
-            <label for="maintenance-message">Maintenance message</label>
-            <textarea id="maintenance-message"
-              placeholder="Example: The game is temporarily unavailable."></textarea>
-          </div>
-          <button id="save-message" class="btn">Save demo message</button>
-          <p id="saved-message" class="muted small-text"></p>
-        </div>
-        <div class="card">
-          <h2 class="section-title">Demo Data</h2>
-          <p class="muted">
-            Add example activity to test the dashboard, or reset the local demo.
-          </p>
-          <button id="add-demo-play" class="btn primary">Add sample game result</button>
-          <hr>
-          <button id="export-data" class="btn">Export demo JSON</button>
-          <button id="reset-data" class="btn danger">Reset all demo data</button>
-          <p class="muted small-text">
-            Exporting or resetting affects only this browser's prototype data.
-          </p>
-        </div>
-      </div>
-    </section>
-  </main>
-  <footer>Gingerbread Operation · Administration</footer>
-</div>
+  <script>
+    "use strict";
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+    // Public project settings only.
+    // Never put the Supabase service-role key in this file.
 
-<script>
-"use strict";
+    const SUPABASE_URL =
+      "https://eddeexcqsmzfzyknmybx.supabase.co";
 
-/*
-  LOCAL PROTOTYPE ONLY.
-  This password is visible in browser source and is NOT security.
-  Do not use real player data or deploy this as a secure admin portal.
-*/
-const DEMO_PASSWORD = "gingerbread-demo";
-const STORAGE_KEY = "gingerbreadOperationAdminDemoV1";
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_Xn5tubxzdr054Ig59xBoWg_2Yu5mr3w";
 
-const $ = id => document.getElementById(id);
-let state = loadState();
+    const ADMIN_EMAIL = "kvelps74@gmail.com";
 
-function emptyState() {
-  return {
-    players: [],
-    plays: [],
-    adjustments: [],
-    gameEnabled: true,
-    maintenanceMessage: ""
-  };
-}
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
 
-function loadState() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? { ...emptyState(), ...JSON.parse(saved) } : emptyState();
-  } catch {
-    return emptyState();
-  }
-}
+    const $ = id => document.getElementById(id);
 
-function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  render();
-}
+    let currentSession = null;
 
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;",
-    '"': "&quot;", "'": "&#39;"
-  })[char]);
-}
+    function localDateString(date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
 
-function notify(message) {
-  const toast = $("toast");
-  toast.textContent = message;
-  toast.style.display = "block";
-  clearTimeout(notify.timer);
-  notify.timer = setTimeout(() => toast.style.display = "none", 3000);
-}
+      return `${year}-${month}-${day}`;
+    }
 
-function signedIn() {
-  $("login-screen").style.display = "none";
-  $("app").style.display = "block";
-  render();
-}
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
 
-$("login-form").addEventListener("submit", event => {
-  event.preventDefault();
-  if ($("admin-password").value === DEMO_PASSWORD) {
-    $("login-error").textContent = "";
-    $("admin-password").value = "";
-    signedIn();
-  } else {
-    $("login-error").textContent = "Incorrect demo password.";
-  }
-});
+    function formatPlayedAt(value) {
+      if (!value) return "—";
 
-$("logout-button").addEventListener("click", () => {
-  $("app").style.display = "none";
-  $("login-screen").style.display = "grid";
-  $("admin-password").value = "";
-});
+      return new Date(value).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
 
-function showPanel(name) {
-  document.querySelectorAll(".panel").forEach(panel => {
-    panel.classList.toggle("active", panel.id === name);
-  });
-  document.querySelectorAll(".nav button").forEach(button => {
-    button.classList.toggle("active", button.dataset.panel === name);
-  });
-}
+    function showSignedIn() {
+      $("login-screen").classList.add("hidden");
+      $("app").classList.remove("hidden");
+    }
 
-document.querySelectorAll("[data-panel]").forEach(button => {
-  button.addEventListener("click", () => showPanel(button.dataset.panel));
-});
-document.querySelectorAll("[data-goto]").forEach(button => {
-  button.addEventListener("click", () => showPanel(button.dataset.goto));
-});
+    function showSignedOut() {
+      $("app").classList.add("hidden");
+      $("login-screen").classList.remove("hidden");
+      $("admin-password").value = "";
+      currentSession = null;
+    }
 
-function playerPlays(playerId) {
-  return state.plays.filter(play => play.playerId === playerId);
-}
-function playerAdjustments(playerId) {
-  return state.adjustments
-    .filter(item => item.playerId === playerId)
-    .reduce((sum, item) => sum + item.change, 0);
-}
-function playerTickets(player) {
-  const earned = playerPlays(player.id)
-    .reduce((sum, play) => sum + play.tickets, 0);
-  return earned + playerAdjustments(player.id);
-}
-function playerWins(player) {
-  return playerPlays(player.id).filter(play => play.won).length;
-}
-function formatDate(value) {
-  return new Date(value).toLocaleString();
-}
+    async function loadDailyResults() {
+      if (!currentSession) return;
 
-function render() {
-  const uniqueEmails = new Set(state.players.map(p => p.email.toLowerCase()));
-  $("stat-plays").textContent = state.plays.length;
-  $("stat-players").textContent = uniqueEmails.size;
-  $("stat-tickets").textContent =
-    state.plays.reduce((sum, play) => sum + play.tickets, 0);
-  $("stat-wins").textContent = state.plays.filter(play => play.won).length;
+      const selectedDate = $("report-date").value;
 
-  const activity = [
-    ...state.plays.map(play => {
-      const player = state.players.find(p => p.id === play.playerId);
-      return {
-        date: play.date,
-        text: `${player ? player.first + " " + player.last : "Unknown player"} — ` +
-          `${play.won ? "Successful challenge" : "Unsuccessful challenge"}, ` +
-          `${play.tickets} prize ticket(s)`
-      };
-    }),
-    ...state.adjustments.map(item => {
-      const player = state.players.find(p => p.id === item.playerId);
-      return {
-        date: item.date,
-        text: `Ticket adjustment for ${player ? player.first + " " + player.last : "Unknown player"}: ` +
-          `${item.change > 0 ? "+" : ""}${item.change} — ${item.reason}`
-      };
-    })
-  ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8);
+      $("refresh-button").disabled = true;
+      $("report-status").textContent = "Loading results…";
 
-  $("recent-activity").innerHTML = activity.length
-    ? activity.map(item =>
-        `<div class="activity-item"><strong>${escapeHTML(item.text)}</strong>` +
-        `<div class="muted small-text">${escapeHTML(formatDate(item.date))}</div></div>`
-      ).join("")
-    : '<div class="empty">No activity yet. Add a demo player and sample game result.</div>';
+      $("results-table").innerHTML =
+        '<tr><td colspan="4" class="empty">Loading…</td></tr>';
 
-  renderPlayers();
-  renderPlayerOptions();
-  renderAdjustments();
-  renderLeaderboard();
-  updateGameStatus();
-}
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/functions/v1/submit-game-result`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": SUPABASE_ANON_KEY,
+              "Authorization": `Bearer ${currentSession.access_token}`
+            },
+            body: JSON.stringify({
+              action: "admin_report",
+              date: selectedDate
+            })
+          }
+        );
 
-function renderPlayers() {
-  const query = $("player-search").value.trim().toLowerCase();
-  const players = state.players.filter(player =>
-    `${player.first} ${player.last} ${player.email}`.toLowerCase().includes(query)
-  );
+        const result = await response.json();
 
-  $("players-table").innerHTML = players.length
-    ? players.map(player => `
-      <tr>
-        <td>${escapeHTML(player.first)} ${escapeHTML(player.last)}</td>
-        <td>${escapeHTML(player.email)}</td>
-        <td>${playerPlays(player.id).length}</td>
-        <td>${playerTickets(player)}</td>
-        <td>${playerWins(player)}</td>
-      </tr>`).join("")
-    : '<tr><td colspan="5" class="empty">No matching demo players.</td></tr>';
-}
+        if (!response.ok) {
+          throw new Error(
+            result.error || "Unable to load the report."
+          );
+        }
 
-$("player-search").addEventListener("input", renderPlayers);
-$("clear-search").addEventListener("click", () => {
-  $("player-search").value = "";
-  renderPlayers();
-});
+        const rows = Array.isArray(result.results)
+          ? result.results
+          : [];
 
-$("player-form").addEventListener("submit", event => {
-  event.preventDefault();
-  const first = $("first-name").value.trim();
-  const last = $("last-name").value.trim();
-  const email = $("work-email").value.trim().toLowerCase();
+        $("total-plays").textContent = rows.length;
 
-  if (!first || !last || !email) return;
-  if (state.players.some(p => p.email.toLowerCase() === email)) {
-    notify("That email already exists in the demo records.");
-    return;
-  }
+        $("total-tickets").textContent = rows.reduce(
+          (sum, row) => sum + Number(row.tickets_earned || 0),
+          0
+        );
 
-  state.players.push({
-    id: crypto.randomUUID(),
-    first, last, email,
-    created: new Date().toISOString()
-  });
-  event.target.reset();
-  saveState();
-  notify("Demo player added.");
-});
+        $("selected-date-label").textContent = new Date(
+          `${selectedDate}T12:00:00`
+        ).toLocaleDateString([], {
+          month: "short",
+          day: "numeric",
+          year: "numeric"
+        });
 
-function renderPlayerOptions() {
-  const select = $("ticket-player");
-  const current = select.value;
-  select.innerHTML = state.players.length
-    ? state.players.map(p =>
-        `<option value="${escapeHTML(p.id)}">${escapeHTML(p.first)} ${escapeHTML(p.last)} — ${escapeHTML(p.email)}</option>`
-      ).join("")
-    : '<option value="">Add a demo player first</option>';
-  if (state.players.some(p => p.id === current)) select.value = current;
-}
+        $("results-table").innerHTML = rows.length
+          ? rows.map(row => `
+              <tr>
+                <td>${escapeHTML(
+                  `${row.first_name || ""} ${row.last_name || ""}`.trim()
+                )}</td>
 
-$("ticket-form").addEventListener("submit", event => {
-  event.preventDefault();
-  const playerId = $("ticket-player").value;
-  const change = Number($("ticket-change").value);
-  const reason = $("ticket-reason").value.trim();
+                <td>${escapeHTML(row.work_email || "")}</td>
 
-  if (!playerId || !Number.isInteger(change) || change === 0 || !reason) {
-    notify("Select a player, enter a non-zero whole number, and add a reason.");
-    return;
-  }
-  const player = state.players.find(p => p.id === playerId);
-  if (!player) return;
-  if (playerTickets(player) + change < 0) {
-    notify("That adjustment would make the ticket balance negative.");
-    return;
-  }
+                <td>
+                  <strong>${Number(row.tickets_earned || 0)}</strong>
+                </td>
 
-  state.adjustments.push({
-    id: crypto.randomUUID(),
-    playerId, change, reason,
-    date: new Date().toISOString()
-  });
-  event.target.reset();
-  saveState();
-  notify("Demo adjustment recorded.");
-});
+                <td>${escapeHTML(formatPlayedAt(row.completed_at))}</td>
+              </tr>
+            `).join("")
+          : `
+              <tr>
+                <td colspan="4" class="empty">
+                  No game results for this date.
+                </td>
+              </tr>
+            `;
 
-function renderAdjustments() {
-  const items = [...state.adjustments].sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
-  $("adjustments-table").innerHTML = items.length
-    ? items.map(item => {
-        const player = state.players.find(p => p.id === item.playerId);
-        return `<tr>
-          <td>${escapeHTML(formatDate(item.date))}</td>
-          <td>${player ? escapeHTML(player.first + " " + player.last) : "Unknown"}</td>
-          <td>${item.change > 0 ? "+" : ""}${item.change}</td>
-          <td>${escapeHTML(item.reason)}</td>
-        </tr>`;
-      }).join("")
-    : '<tr><td colspan="4" class="empty">No adjustments recorded.</td></tr>';
-}
+        $("report-status").textContent =
+          `Showing ${rows.length} game result(s).`;
 
-function renderLeaderboard() {
-  const sorted = [...state.players].sort((a, b) =>
-    playerTickets(b) - playerTickets(a) ||
-    new Date(a.created) - new Date(b.created)
-  );
-  $("leaderboard-table").innerHTML = sorted.length
-    ? sorted.map((player, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${escapeHTML(player.first)} ${escapeHTML(player.last.charAt(0))}.</td>
-        <td>${playerTickets(player)}</td>
-        <td>${playerWins(player)}</td>
-        <td><button class="btn small danger" data-remove-player="${escapeHTML(player.id)}">
-          Remove demo player
-        </button></td>
-      </tr>`).join("")
-    : '<tr><td colspan="5" class="empty">No demo leaderboard entries yet.</td></tr>';
-}
+      } catch (error) {
+        console.error("Admin report error:", error);
 
-$("leaderboard-table").addEventListener("click", event => {
-  const button = event.target.closest("[data-remove-player]");
-  if (!button) return;
-  const player = state.players.find(p => p.id === button.dataset.removePlayer);
-  if (!player) return;
-  if (!confirm(`Remove ${player.first} ${player.last} and all their demo records?`)) return;
+        $("total-plays").textContent = "—";
+        $("total-tickets").textContent = "—";
+        $("selected-date-label").textContent = "—";
 
-  state.players = state.players.filter(p => p.id !== player.id);
-  state.plays = state.plays.filter(play => play.playerId !== player.id);
-  state.adjustments = state.adjustments.filter(item => item.playerId !== player.id);
-  saveState();
-  notify("Demo leaderboard entry and demo records removed.");
-});
+        $("results-table").innerHTML = `
+          <tr>
+            <td colspan="4" class="empty">
+              The report could not be loaded.
+            </td>
+          </tr>
+        `;
 
-function updateGameStatus() {
-  const enabled = state.gameEnabled;
-  $("game-status").textContent = enabled ? "Enabled" : "Disabled";
-  $("dashboard-game-status").textContent = enabled ? "Enabled" : "Disabled";
-  $("game-status").className = enabled ? "badge" : "badge off";
-  $("dashboard-game-status").className = enabled ? "badge" : "badge off";
-  $("toggle-game").textContent = enabled ? "Disable demo game" : "Enable demo game";
-  $("maintenance-message").value = state.maintenanceMessage || "";
-  $("saved-message").textContent = state.maintenanceMessage
-    ? "Saved demo message: " + state.maintenanceMessage
-    : "No maintenance message saved.";
-}
+        $("report-status").textContent =
+          error.message || "Unable to load results. Please try again.";
 
-$("toggle-game").addEventListener("click", () => {
-  state.gameEnabled = !state.gameEnabled;
-  saveState();
-  notify(`Demo game ${state.gameEnabled ? "enabled" : "disabled"}.`);
-});
+      } finally {
+        $("refresh-button").disabled = false;
+      }
+    }
 
-$("save-message").addEventListener("click", () => {
-  state.maintenanceMessage = $("maintenance-message").value.trim();
-  saveState();
-  notify("Demo maintenance message saved.");
-});
+    // ADMIN LOGIN
+    $("login-form").addEventListener("submit", async event => {
+      event.preventDefault();
 
-$("add-demo-play").addEventListener("click", () => {
-  if (!state.players.length) {
-    notify("Add a demo player first in Player Management.");
-    showPanel("players");
-    return;
-  }
-  const player = state.players[Math.floor(Math.random() * state.players.length)];
-  const won = Math.random() > 0.4;
-  state.plays.push({
-    id: crypto.randomUUID(),
-    playerId: player.id,
-    date: new Date().toISOString(),
-    won,
-    tickets: won ? Math.floor(Math.random() * 10) + 1 : 1
-  });
-  saveState();
-  notify("Sample game result added.");
-});
+      $("login-button").disabled = true;
+      $("login-error").textContent = "";
 
-$("export-data").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(state, null, 2)], {
-    type: "application/json"
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "gingerbread-operation-demo-data.json";
-  link.click();
-  URL.revokeObjectURL(url);
-  notify("Demo data export requested.");
-});
+      const email = $("admin-email").value.trim().toLowerCase();
+      const password = $("admin-password").value;
 
-$("reset-data").addEventListener("click", () => {
-  if (!confirm("Delete all local demo players, plays, and adjustments?")) return;
-  state = emptyState();
-  saveState();
-  notify("Local demo data reset.");
-});
+      if (email !== ADMIN_EMAIL) {
+        $("login-error").textContent =
+          "This account is not authorized for admin access.";
 
-render();
-</script>
+        $("login-button").disabled = false;
+        return;
+      }
+
+      try {
+        const { data, error } =
+          await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+        if (error) throw error;
+
+        currentSession = data.session;
+
+        showSignedIn();
+
+        $("admin-password").value = "";
+        $("report-date").value = localDateString();
+
+        await loadDailyResults();
+
+      } catch (error) {
+        console.error("Admin sign-in error:", error);
+
+        $("login-error").textContent =
+          error.message ||
+          "Unable to sign in. Check your email and password.";
+
+      } finally {
+        $("login-button").disabled = false;
+      }
+    });
+
+    // REFRESH AND DATE SELECTION
+    $("refresh-button").addEventListener(
+      "click",
+      loadDailyResults
+    );
+
+    $("report-date").addEventListener(
+      "change",
+      loadDailyResults
+    );
+
+    // LOG OUT
+    $("logout-button").addEventListener("click", async () => {
+      await supabaseClient.auth.signOut();
+      showSignedOut();
+    });
+
+    // RESTORE EXISTING LOGIN SESSION
+    async function restoreSession() {
+      const { data, error } =
+        await supabaseClient.auth.getSession();
+
+      if (error || !data.session) return;
+
+      const email = data.session.user?.email?.toLowerCase();
+
+      if (email !== ADMIN_EMAIL) {
+        await supabaseClient.auth.signOut();
+        return;
+      }
+
+      currentSession = data.session;
+
+      showSignedIn();
+
+      $("report-date").value = localDateString();
+
+      await loadDailyResults();
+    }
+
+    $("report-date").value = localDateString();
+
+    restoreSession();
+  </script>
+
 </body>
 </html>
