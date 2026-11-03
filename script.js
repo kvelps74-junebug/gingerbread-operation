@@ -389,6 +389,81 @@ async function submitGameResult(score) {
 
 }
 
+// ===================================
+// LOAD LEADERBOARD FROM SUPABASE
+// ===================================
+
+async function loadLeaderboard() {
+
+    const leaderboardElement =
+        document.getElementById("leaderboard");
+
+    try {
+
+        const response = await fetch(
+            SUPABASE_FUNCTION_URL,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_PUBLIC_KEY,
+                    "Authorization": `Bearer ${SUPABASE_PUBLIC_KEY}`
+                },
+
+                body: JSON.stringify({
+                    action: "leaderboard"
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.error || "Unable to load leaderboard."
+            );
+        }
+
+        leaderboardElement.innerHTML = "";
+
+        if (!result.leaderboard.length) {
+
+            const item = document.createElement("li");
+
+            item.textContent = "No players yet. Be the first!";
+
+            leaderboardElement.appendChild(item);
+
+            return;
+        }
+
+        result.leaderboard.forEach(
+            function (player) {
+
+                const item = document.createElement("li");
+
+                item.textContent =
+                    `${player.first_name} ${player.last_name} — ${player.tickets_earned} prize tickets`;
+
+                leaderboardElement.appendChild(item);
+
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Leaderboard loading failed:",
+            error
+        );
+
+        leaderboardElement.innerHTML =
+            "<li>Leaderboard temporarily unavailable.</li>";
+
+    }
+
+}
 
 // ===================================
 // START GAME
@@ -2230,3 +2305,9 @@ function handleWin() {
         300
     );
 }
+
+// ===================================
+// INITIALIZE LEADERBOARD
+// ===================================
+
+loadLeaderboard();

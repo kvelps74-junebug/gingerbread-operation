@@ -161,6 +161,77 @@ Deno.serve(async (req: Request) => {
       return respond({ success: true });
     }
 
+    // ===================================
+    // GET LEADERBOARD
+    // ===================================
+
+    if (body.action === "leaderboard") {
+
+      const { data: results, error: resultsError } =
+        await supabase
+          .from("game_results")
+          .select("player_id, score, completed_at")
+          .order("score", { ascending: false })
+          .order("completed_at", { ascending: true });
+
+      if (resultsError) throw resultsError;
+
+      const bestScores = new Map();
+
+      for (const result of results || []) {
+
+        if (!bestScores.has(result.player_id)) {
+          bestScores.set(result.player_id, result.score);
+        }
+
+      }
+
+      const playerIds = Array.from(bestScores.keys());
+
+      if (playerIds.length === 0) {
+        return respond({
+          success: true,
+          leaderboard: []
+        });
+      }
+
+      const { data: players, error: playersError } =
+        await supabase
+          .from("players")
+          .select("id, first_name, last_name")
+          .in("id", playerIds);
+
+      if (playersError) throw playersError;
+
+      const playerMap = new Map();
+
+      for (const player of players || []) {
+        playerMap.set(player.id, player);
+      }
+
+      const leaderboard = [];
+
+      for (const playerId of playerIds) {
+
+        const player = playerMap.get(playerId);
+
+        if (!player) continue;
+
+        leaderboard.push({
+          first_name: player.first_name,
+          last_name: player.last_name,
+          tickets_earned: bestScores.get(playerId)
+        });
+
+      }
+
+      return respond({
+        success: true,
+        leaderboard
+      });
+
+    }
+
     return respond({ error: "Unknown action." }, 400);
   } catch (error) {
     console.error("Game submission error:", error);
