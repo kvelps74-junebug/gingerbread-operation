@@ -521,7 +521,7 @@ startButton.addEventListener(
 
         }
 
-     // -----------------------------------
+// -----------------------------------
 // REGISTER PLAYER WITH SUPABASE
 // -----------------------------------
 
@@ -536,6 +536,44 @@ try {
 
     // Save the registered player's ID for submitting their result later.
     currentPlayerId = player.player_id;
+    // -----------------------------------
+    // CHECK 24-HOUR PLAY RESTRICTION
+    // -----------------------------------
+
+    if (player.last_played_at) {
+
+        const lastPlayed =
+            new Date(player.last_played_at).getTime();
+
+        const twentyFourHours =
+            24 * 60 * 60 * 1000;
+
+        const timeSinceLastPlay =
+            Date.now() - lastPlayed;
+
+        if (timeSinceLastPlay < twentyFourHours) {
+
+            const remainingTime =
+                twentyFourHours - timeSinceLastPlay;
+
+            const hoursRemaining =
+                Math.floor(remainingTime / (60 * 60 * 1000));
+
+            const minutesRemaining =
+                Math.ceil(
+                    (remainingTime % (60 * 60 * 1000)) /
+                    (60 * 1000)
+                );
+
+            alert(
+                `You've already played Gingerbread Operation!\n\nYou can play again in approximately ${hoursRemaining} hours and ${minutesRemaining} minutes.`
+            );
+
+            return;
+
+        }
+
+    }
 
 } catch (error) {
     console.error("Player registration failed:", error);
